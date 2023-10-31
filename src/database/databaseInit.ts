@@ -1,7 +1,7 @@
 import { Client } from 'pg';
-import { dbConfig } from '../../config/dbConfig';
+import { dbConfig } from '../config/dbConfig';
 
-export async function createDbIfNotExist() {
+async function createDbIfNotExist() {
   const client = new Client({
     host: dbConfig.dbHost,
     user: dbConfig.dbUser,
@@ -25,3 +25,5 @@ export async function createDbIfNotExist() {
 
   await client.end();
 }
+
+createDbIfNotExist();
