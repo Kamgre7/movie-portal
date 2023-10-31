@@ -3,6 +3,7 @@ import express, { Application } from 'express';
 import 'express-async-errors';
 import { appConfig } from './config/appConfig';
 import { errorHandler } from './middlewares/errorHandler';
+import { mainRouter } from './routes/mainRouter';
 
 export class Bootstrap {
   private readonly app: Application;
@@ -21,7 +22,7 @@ export class Bootstrap {
   }
 
   private configureRoutes(): void {
-    // this.app.use('/user', user);
+    this.app.use('/', mainRouter);
   }
 
   private configureErrorHandler(): void {
