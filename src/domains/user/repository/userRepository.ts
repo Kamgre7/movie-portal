@@ -1,63 +1,52 @@
 import { injectable } from 'inversify';
 import { database } from '../../../database/database';
-import { NewUser, User } from '../../../database/schemas/user.schema';
 import { BadRequestError } from '../../../errors/badRequestError';
 import { DbError, DbErrorCodes } from '../../../errors/dbError';
-import { NoResultError } from 'kysely';
+import { IUserModel, User } from '../models/userModel';
+import { NewUser } from '../schemas/createUserSchema';
 
 export interface IUserRepository {
-  findById(id: string): Promise<User>;
-  create(newUser: NewUser): Promise<string>;
+  findById(id: string): Promise<IUserModel | undefined>;
+  create(newUser: NewUser): Promise<IUserModel>;
 }
 
 @injectable()
 export class UserRepository implements IUserRepository {
   constructor(private readonly db = database) {}
 
-  async findById(id: string): Promise<User> {
+  async findById(id: string): Promise<IUserModel | undefined> {
+    const user = await this.db
+      .selectFrom('user')
+      .where('id', '=', id)
+      .selectAll()
+      .executeTakeFirst();
+
+    return user ? [user].map((userModel) => new User(userModel))[0] : undefined;
+  }
+
+  async create(newUser: NewUser): Promise<IUserModel> {
     try {
       const user = await this.db
-        .selectFrom('user')
-        .where('id', '=', id)
-        .selectAll()
-        .executeTakeFirstOrThrow();
-
-      return user;
-    } catch (err) {
-      if (err instanceof NoResultError) {
-        throw new BadRequestError('User not found', 404);
-      }
-      throw this.mapError(err);
-    }
-  }
-
-  async create(newUser: NewUser): Promise<string> {
-    try {
-      const { id } = await this.db
         .insertInto('user')
         .values(newUser)
-        .returning('id')
+        .returningAll()
         .executeTakeFirstOrThrow();
 
-      return id;
-    } catch (err) {
+      return [user].map((userModel) => new User(userModel))[0];
+    } catch (err: any) {
       throw this.mapError(err);
     }
   }
 
-  private mapError(err: any): DbError {
+  private mapError(err: any): BadRequestError | DbError {
     if (err.code === DbErrorCodes.UNIQUE_CONSTRAINT_VIOLATION) {
-      return new DbError('User with this email already exists');
+      return new BadRequestError(err.detail);
     }
 
     if (err.code === DbErrorCodes.NOT_NULL_VIOLATION) {
-      return new DbError('Value cannot be null');
+      return new BadRequestError(err.detail);
     }
 
-    if (err.code === DbErrorCodes.FOREIGN_KEY_VIOLATION) {
-      return new DbError('Relation not found');
-    }
-
-    return new DbError('Something went wrong, try again later', 500);
+    return new DbError(err.detail);
   }
 }

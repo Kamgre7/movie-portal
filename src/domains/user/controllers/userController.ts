@@ -35,10 +35,10 @@ export class UserController implements IUserController {
   ): Promise<void> => {
     const { body } = req;
 
-    const userId = await this.userService.create(body);
+    const user = await this.userService.create(body);
 
     res.status(201).json({
-      userId,
+      user,
     });
   };
 }
