@@ -4,12 +4,12 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "ts-node index.ts",
-    "start:dev": "tsnd index.ts",
-    "migrations": "npm run dbInit && ts-node ./src/database/runMigrations.ts",
-    "dbInit": "ts-node ./src/database/databaseInit.ts",
+    "start": "ts-node -r dotenv/config index.ts",
+    "start:dev": "tsnd -r dotenv/config index.ts",
+    "migrations": "ts-node -r dotenv/config ./src/database/runMigrations.ts",
+    "dbInit": "ts-node -r dotenv/config ./src/database/scripts/databaseInit.ts",
     "build": "tsc",
-    "test": "jest",
+    "test": "jest ",
     "start:prod": "tsc && node dist/index"
   },
   "keywords": [],

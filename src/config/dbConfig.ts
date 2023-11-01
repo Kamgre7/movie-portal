@@ -1,7 +1,4 @@
-import * as dotenv from 'dotenv';
 import { z } from 'zod';
-
-dotenv.config();
 
 export const DbSchema = z.object({
   dbName: z.string().min(1),
