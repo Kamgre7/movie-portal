@@ -7,7 +7,7 @@ export const DbErrorCodes = {
 };
 
 export class DbError extends AppError {
-  constructor(message: string, code: number = 400) {
+  constructor(message: string, code: number = 500) {
     super(message, code);
   }
 }
