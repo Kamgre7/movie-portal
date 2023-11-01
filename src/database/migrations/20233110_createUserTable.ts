@@ -11,7 +11,10 @@ export async function up(db: Kysely<any>): Promise<void> {
   await db.schema
     .createTable('user')
     .addColumn('id', 'uuid', (col) =>
-      col.primaryKey().unique().defaultTo(uuid())
+      col
+        .primaryKey()
+        .unique()
+        .defaultTo(sql`gen_random_uuid()`)
     )
     .addColumn('email', 'varchar(50)', (col) => col.unique().notNull())
     .addColumn('firstName', 'varchar', (col) => col.notNull())
