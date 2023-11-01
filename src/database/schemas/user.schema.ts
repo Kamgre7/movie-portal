@@ -8,7 +8,7 @@ export interface UserTable {
   lastName: string;
   password: string;
   gender: SexType;
-  createdAt: Date;
-  updatedAt: Date;
-  deletedAt: Date;
+  createdAt: Generated<Date>;
+  updatedAt: Generated<Date>;
+  deletedAt: Generated<Date>;
 }
