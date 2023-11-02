@@ -1,12 +1,8 @@
 import { Kysely, sql } from 'kysely';
-import { v4 as uuid } from 'uuid';
-import { SEX } from '../../domains/user/types/sexType';
+import { genderTypeInit } from '../scripts/dbTypesInit';
 
 export async function up(db: Kysely<any>): Promise<void> {
-  await db.schema
-    .createType('UserGender')
-    .asEnum([SEX.FEMALE, SEX.MALE])
-    .execute();
+  await genderTypeInit(db);
 
   await db.schema
     .createTable('user')
@@ -27,6 +23,6 @@ export async function up(db: Kysely<any>): Promise<void> {
     .execute();
 }
 
-export async function userTableDown(db: Kysely<any>): Promise<void> {
+export async function down(db: Kysely<any>): Promise<void> {
   await db.schema.dropTable('user').execute();
 }
