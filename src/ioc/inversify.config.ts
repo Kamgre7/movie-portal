@@ -16,6 +16,18 @@ import {
   IUserController,
   UserController,
 } from '../domains/user/controllers/userController';
+import {
+  IMovieRepository,
+  MovieRepository,
+} from '../domains/movie/repository/movieRepository';
+import {
+  IMovieService,
+  MovieService,
+} from '../domains/movie/services/movieService';
+import {
+  IMovieController,
+  MovieController,
+} from '../domains/movie/controllers/movieController';
 
 export const container = new Container();
 
@@ -32,3 +44,15 @@ container.bind<IUserService>(TYPES.UserServiceToken).to(UserService);
 container.bind<IUserRepository>(TYPES.UserRepositoryToken).to(UserRepository);
 
 container.bind<IUserController>(TYPES.UserControllerToken).to(UserController);
+
+// movie
+
+container
+  .bind<IMovieRepository>(TYPES.MovieRepositoryToken)
+  .to(MovieRepository);
+
+container.bind<IMovieService>(TYPES.MovieServiceToken).to(MovieService);
+
+container
+  .bind<IMovieController>(TYPES.MovieControllerToken)
+  .to(MovieController);
