@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { CATEGORY } from '../types/categoryType';
 
 export const CreateMovieBodySchema = z.object({
-  title: z.string().min(2),
+  title: z.string().trim().min(2),
   category: z.enum([
     CATEGORY.ACTION,
     CATEGORY.COMEDY,
@@ -10,7 +10,7 @@ export const CreateMovieBodySchema = z.object({
     CATEGORY.FANTASY,
     CATEGORY.THRILLER,
   ]),
-  releaseDate: z.coerce.date(),
+  releaseDate: z.coerce.date().refine((val) => val < new Date()),
 });
 
 export const CreateMovieSchema = z.object({

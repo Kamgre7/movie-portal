@@ -8,4 +8,4 @@ export const FindMovieByIdSchema = z.object({
   params: FindMovieByIdParamSchema,
 });
 
-export type FindUserByIdReq = z.infer<typeof FindMovieByIdSchema>;
+export type FindMovieByIdReq = z.infer<typeof FindMovieByIdSchema>;
