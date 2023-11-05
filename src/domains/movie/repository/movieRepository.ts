@@ -10,7 +10,7 @@ export interface IMovieRepository {
   create(newMovie: NewMovie): Promise<IMovieModel>;
 }
 
-injectable();
+@injectable()
 export class MovieRepository implements IMovieRepository {
   constructor(private readonly db = database) {}
 
