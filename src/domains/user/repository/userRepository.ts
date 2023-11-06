@@ -1,9 +1,11 @@
-import { injectable } from 'inversify';
+import { inject, injectable } from 'inversify';
 import { database } from '../../../database/database';
 import { BadRequestError } from '../../../errors/badRequestError';
 import { DbError, DbErrorCodes } from '../../../errors/dbError';
-import { IUserModel, User } from '../models/userModel';
+import { IUserModel } from '../models/userModel';
 import { NewUser } from '../schemas/createUserSchema';
+import { TYPES } from '../../../ioc/types/types';
+import { IUserFactory } from './userFactory';
 
 export interface IUserRepository {
   findById(id: string): Promise<IUserModel | undefined>;
@@ -12,7 +14,11 @@ export interface IUserRepository {
 
 @injectable()
 export class UserRepository implements IUserRepository {
-  constructor(private readonly db = database) {}
+  constructor(
+    @inject(TYPES.UserFactoryToken)
+    private readonly userFactory: IUserFactory,
+    private readonly db = database
+  ) {}
 
   async findById(id: string): Promise<IUserModel | undefined> {
     const user = await this.db
@@ -21,7 +27,7 @@ export class UserRepository implements IUserRepository {
       .selectAll()
       .executeTakeFirst();
 
-    return user ? [user].map((userModel) => new User(userModel))[0] : undefined;
+    return user ? this.userFactory.createUser(user) : undefined;
   }
 
   async create(newUser: NewUser): Promise<IUserModel> {
@@ -32,7 +38,7 @@ export class UserRepository implements IUserRepository {
         .returningAll()
         .executeTakeFirstOrThrow();
 
-      return [user].map((userModel) => new User(userModel))[0];
+      return this.userFactory.createUser(user);
     } catch (err: any) {
       throw this.mapError(err);
     }

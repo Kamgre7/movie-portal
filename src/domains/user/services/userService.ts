@@ -20,7 +20,7 @@ export class UserService implements IUserService {
     private readonly userRepository: IUserRepository
   ) {}
 
-  async create(newUser: Omit<NewUser, 'passwordSalt'>): Promise<IUserModel> {
+  async create(newUser: NewUser): Promise<IUserModel> {
     const passwordSalt = await this.passwordManager.generateSalt();
     const password = await this.passwordManager.hashPwd(
       newUser.password,

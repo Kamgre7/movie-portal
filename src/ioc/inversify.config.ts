@@ -28,6 +28,22 @@ import {
   IMovieController,
   MovieController,
 } from '../domains/movie/controllers/movieController';
+import {
+  ActorRepository,
+  IActorRepository,
+} from '../domains/actor/repository/actorRepository';
+import {
+  ActorService,
+  IActorService,
+} from '../domains/actor/services/actorService';
+import {
+  ActorController,
+  IActorController,
+} from '../domains/actor/controllers/actorController';
+import {
+  IUserFactory,
+  UserFactory,
+} from '../domains/user/repository/userFactory';
 
 export const container = new Container();
 
@@ -38,6 +54,8 @@ container
   .to(PasswordManager);
 
 // user
+
+container.bind<IUserFactory>(TYPES.UserFactoryToken).to(UserFactory);
 
 container.bind<IUserService>(TYPES.UserServiceToken).to(UserService);
 
@@ -56,3 +74,15 @@ container.bind<IMovieService>(TYPES.MovieServiceToken).to(MovieService);
 container
   .bind<IMovieController>(TYPES.MovieControllerToken)
   .to(MovieController);
+
+// actor
+
+container
+  .bind<IActorRepository>(TYPES.ActorRepositoryToken)
+  .to(ActorRepository);
+
+container.bind<IActorService>(TYPES.ActorServiceToken).to(ActorService);
+
+container
+  .bind<IActorController>(TYPES.ActorControllerToken)
+  .to(ActorController);
