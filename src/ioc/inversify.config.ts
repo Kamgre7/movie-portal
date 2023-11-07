@@ -44,6 +44,7 @@ import {
   IUserFactory,
   UserFactory,
 } from '../domains/user/repository/userFactory';
+import { ErrorMapper, IErrorMapper } from '../errors/errorMapper';
 
 export const container = new Container();
 
@@ -86,3 +87,7 @@ container.bind<IActorService>(TYPES.ActorServiceToken).to(ActorService);
 container
   .bind<IActorController>(TYPES.ActorControllerToken)
   .to(ActorController);
+
+// errorMapper
+
+container.bind<IErrorMapper>(TYPES.ErrorMapperToken).to(ErrorMapper);

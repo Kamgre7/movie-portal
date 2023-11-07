@@ -13,4 +13,6 @@ export const TYPES = {
   ActorRepositoryToken: Symbol.for('IActorRepository'),
   ActorServiceToken: Symbol.for('IActorService'),
   ActorControllerToken: Symbol.for('IActorController'),
+
+  ErrorMapperToken: Symbol.for('IErrorMapper'),
 };
