@@ -1,9 +1,6 @@
 import { Kysely, sql } from 'kysely';
-import { genderTypeInit } from '../scripts/dbTypesInit';
 
 export async function up(db: Kysely<any>): Promise<void> {
-  await genderTypeInit(db);
-
   await db.schema
     .createTable('user')
     .addColumn('id', 'uuid', (col) =>
