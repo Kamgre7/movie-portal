@@ -1,11 +1,10 @@
 import { inject, injectable } from 'inversify';
 import { database } from '../../../database/database';
-import { BadRequestError } from '../../../errors/badRequestError';
-import { DbError, DbErrorCodes } from '../../../errors/dbError';
 import { IUserModel } from '../models/userModel';
 import { NewUser } from '../schemas/createUserSchema';
 import { TYPES } from '../../../ioc/types/types';
 import { IUserFactory } from './userFactory';
+import { IErrorMapper } from '../../../errors/errorMapper';
 
 export interface IUserRepository {
   findById(id: string): Promise<IUserModel | undefined>;
@@ -17,6 +16,8 @@ export class UserRepository implements IUserRepository {
   constructor(
     @inject(TYPES.UserFactoryToken)
     private readonly userFactory: IUserFactory,
+    @inject(TYPES.ErrorMapperToken)
+    private readonly errorMapper: IErrorMapper,
     private readonly db = database
   ) {}
 
@@ -40,19 +41,7 @@ export class UserRepository implements IUserRepository {
 
       return this.userFactory.createUser(user);
     } catch (err: any) {
-      throw this.mapError(err);
+      throw this.errorMapper.mapRepositoryError(err);
     }
-  }
-
-  private mapError(err: any): BadRequestError | DbError {
-    if (err.code === DbErrorCodes.UNIQUE_CONSTRAINT_VIOLATION) {
-      return new BadRequestError(err.detail);
-    }
-
-    if (err.code === DbErrorCodes.NOT_NULL_VIOLATION) {
-      return new BadRequestError(err.detail);
-    }
-
-    return new DbError(err.detail);
   }
 }

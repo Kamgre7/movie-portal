@@ -1,9 +1,9 @@
-import { injectable } from 'inversify';
+import { inject, injectable } from 'inversify';
 import { database } from '../../../database/database';
-import { BadRequestError } from '../../../errors/badRequestError';
-import { DbError, DbErrorCodes } from '../../../errors/dbError';
 import { IMovieModel, Movie } from '../models/movieModel';
 import { NewMovie } from '../schemas/createMovieSchema';
+import { TYPES } from '../../../ioc/types/types';
+import { IErrorMapper } from '../../../errors/errorMapper';
 
 export interface IMovieRepository {
   findById(id: string): Promise<IMovieModel | undefined>;
@@ -12,7 +12,11 @@ export interface IMovieRepository {
 
 @injectable()
 export class MovieRepository implements IMovieRepository {
-  constructor(private readonly db = database) {}
+  constructor(
+    @inject(TYPES.ErrorMapperToken)
+    private readonly errorMapper: IErrorMapper,
+    private readonly db = database
+  ) {}
 
   async findById(id: string): Promise<IMovieModel | undefined> {
     const movie = await this.db
@@ -36,19 +40,7 @@ export class MovieRepository implements IMovieRepository {
 
       return [movie].map((movieModel) => new Movie(movieModel))[0];
     } catch (err) {
-      throw this.mapError(err);
+      throw this.errorMapper.mapRepositoryError(err);
     }
-  }
-
-  private mapError(err: any): BadRequestError | DbError {
-    if (err.code === DbErrorCodes.UNIQUE_CONSTRAINT_VIOLATION) {
-      return new BadRequestError(err.detail);
-    }
-
-    if (err.code === DbErrorCodes.NOT_NULL_VIOLATION) {
-      return new BadRequestError(err.detail);
-    }
-
-    return new DbError(err.detail);
   }
 }
