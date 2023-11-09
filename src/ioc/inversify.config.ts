@@ -45,6 +45,10 @@ import {
   UserFactory,
 } from '../domains/user/repository/userFactory';
 import { ErrorMapper, IErrorMapper } from '../errors/errorMapper';
+import {
+  IMovieFactory,
+  MovieFactory,
+} from '../domains/movie/repository/movieFactory';
 
 export const container = new Container();
 
@@ -65,6 +69,8 @@ container.bind<IUserRepository>(TYPES.UserRepositoryToken).to(UserRepository);
 container.bind<IUserController>(TYPES.UserControllerToken).to(UserController);
 
 // movie
+
+container.bind<IMovieFactory>(TYPES.MovieFactoryToken).to(MovieFactory);
 
 container
   .bind<IMovieRepository>(TYPES.MovieRepositoryToken)
