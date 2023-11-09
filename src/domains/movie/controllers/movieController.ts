@@ -5,10 +5,13 @@ import { CreateMovieReq } from '../schemas/createMovieSchema';
 import { FindMovieByIdReq } from '../schemas/findMovieByIdSchema';
 import { TYPES } from '../../../ioc/types/types';
 import { IMovieService } from '../services/movieService';
+import { RateMovieReq } from '../schemas/rateMovieSchema';
 
 export interface IMovieController {
   findById(req: ParsedRequest<FindMovieByIdReq>, res: Response): Promise<void>;
   create(req: ParsedRequest<CreateMovieReq>, res: Response): Promise<void>;
+  rate(req: ParsedRequest<RateMovieReq>, res: Response): Promise<void>;
+  updateRate(req: ParsedRequest<RateMovieReq>, res: Response): Promise<void>;
 }
 
 @injectable()
@@ -40,5 +43,31 @@ export class MovieController implements IMovieController {
     res.status(201).json({
       movie,
     });
+  };
+
+  rate = async (
+    req: ParsedRequest<RateMovieReq>,
+    res: Response
+  ): Promise<void> => {
+    const { id } = req.params;
+    const { rate, userId } = req.body;
+
+    const movieInfo = await this.movieService.rate(id, userId, rate);
+
+    res.status(201).json({
+      movieInfo,
+    });
+  };
+
+  updateRate = async (
+    req: ParsedRequest<RateMovieReq>,
+    res: Response
+  ): Promise<void> => {
+    const { id } = req.params;
+    const { rate, userId } = req.body;
+
+    await this.movieService.updateRate(id, userId, rate);
+
+    res.status(204).end();
   };
 }
