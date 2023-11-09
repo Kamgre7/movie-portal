@@ -5,6 +5,6 @@ import { actorRouter } from '../domains/actor/routes/actorRoutes';
 
 export const mainRouter = Router();
 
-mainRouter.use('/user', userRouter);
-mainRouter.use('/movie', movieRouter);
-mainRouter.use('/actor', actorRouter);
+mainRouter.use('/users', userRouter);
+mainRouter.use('/movies', movieRouter);
+mainRouter.use('/actors', actorRouter);
