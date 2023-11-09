@@ -18,6 +18,14 @@ export async function up(db: Kysely<any>): Promise<void> {
     .addColumn('updatedAt', 'timestamp', (col) => col.defaultTo(sql`now()`))
     .addColumn('deletedAt', 'timestamp', (col) => col.defaultTo(null))
     .execute();
+
+  await db.schema
+    .createTable('user_movie_ratings')
+    .addColumn('movieId', 'uuid', (col) => col.references('movie.id').notNull())
+    .addColumn('userId', 'uuid', (col) => col.references('user.id').notNull())
+    .addColumn('rating', 'integer', (col) => col.notNull())
+    .addPrimaryKeyConstraint('movie_primary_key', ['movieId', 'userId'])
+    .execute();
 }
 
 export async function down(db: Kysely<any>): Promise<void> {
