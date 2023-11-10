@@ -6,12 +6,22 @@ import { FindMovieByIdReq } from '../schemas/findMovieByIdSchema';
 import { TYPES } from '../../../ioc/types/types';
 import { IMovieService } from '../services/movieService';
 import { RateMovieReq } from '../schemas/rateMovieSchema';
+import { AddActorMovieReq } from '../schemas/addActorsMovieSchema';
 
 export interface IMovieController {
   findById(req: ParsedRequest<FindMovieByIdReq>, res: Response): Promise<void>;
   create(req: ParsedRequest<CreateMovieReq>, res: Response): Promise<void>;
   rate(req: ParsedRequest<RateMovieReq>, res: Response): Promise<void>;
   updateRate(req: ParsedRequest<RateMovieReq>, res: Response): Promise<void>;
+  findWithRating(
+    req: ParsedRequest<FindMovieByIdReq>,
+    res: Response
+  ): Promise<void>;
+  findWithActors(
+    req: ParsedRequest<FindMovieByIdReq>,
+    res: Response
+  ): Promise<void>;
+  addActors(req: ParsedRequest<AddActorMovieReq>, res: Response): Promise<void>;
 }
 
 @injectable()
@@ -45,6 +55,17 @@ export class MovieController implements IMovieController {
     });
   };
 
+  findWithRating = async (
+    req: ParsedRequest<FindMovieByIdReq>,
+    res: Response
+  ): Promise<void> => {
+    const movie = await this.movieService.findWithRating(req.params.id);
+
+    res.status(200).json({
+      movie,
+    });
+  };
+
   rate = async (
     req: ParsedRequest<RateMovieReq>,
     res: Response
@@ -69,5 +90,27 @@ export class MovieController implements IMovieController {
     await this.movieService.updateRate(id, userId, rate);
 
     res.status(204).end();
+  };
+
+  findWithActors = async (
+    req: ParsedRequest<FindMovieByIdReq>,
+    res: Response
+  ) => {
+    const movie = await this.movieService.findWithActors(req.params.id);
+
+    res.status(200).json({
+      movie,
+    });
+  };
+
+  addActors = async (req: ParsedRequest<AddActorMovieReq>, res: Response) => {
+    const insertedRows = await this.movieService.addActors(
+      req.params.id,
+      req.body.actorIds
+    );
+
+    res.status(201).json({
+      insertedRows,
+    });
   };
 }

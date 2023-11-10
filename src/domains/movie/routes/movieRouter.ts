@@ -6,6 +6,7 @@ import { container } from '../../../ioc/inversify.config';
 import { IMovieController } from '../controllers/movieController';
 import { TYPES } from '../../../ioc/types/types';
 import { RateMovieSchema } from '../schemas/rateMovieSchema';
+import { AddActorMovieSchema } from '../schemas/addActorsMovieSchema';
 
 export const movieRouter = Router();
 
@@ -19,8 +20,14 @@ movieRouter
 
 movieRouter
   .route('/:id/rate')
+  .get(requestValidator(FindMovieByIdSchema), movieController.findWithRating)
   .post(requestValidator(RateMovieSchema), movieController.rate)
   .patch(requestValidator(RateMovieSchema), movieController.updateRate);
+
+movieRouter
+  .route('/:id/actors')
+  .get(requestValidator(FindMovieByIdSchema), movieController.findWithActors)
+  .post(requestValidator(AddActorMovieSchema), movieController.addActors);
 
 movieRouter
   .route('/:id')

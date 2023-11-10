@@ -7,11 +7,17 @@ import { TYPES } from '../../../ioc/types/types';
 import { IErrorMapper } from '../../../errors/errorMapper';
 import { IMovieWithRatingModel } from '../models/movieWithRatingModel';
 import { IMovieFactory } from './movieFactory';
+import { IMovieWithActorsModel } from '../models/movieWithActorsModel';
 
 export type MovieRating = {
   userId: string;
   movieId: string;
   rating: number;
+};
+
+export type MovieActors = {
+  movieId: string;
+  actorId: string;
 };
 
 export interface IMovieRepository {
@@ -20,6 +26,8 @@ export interface IMovieRepository {
   rate(movieId: string, userId: string, rating: number): Promise<MovieRating>;
   findWithRating(id: string): Promise<IMovieWithRatingModel | undefined>;
   updateRate(movieId: string, userId: string, rating: number): Promise<number>;
+  addActors(actorsMovieInfo: MovieActors[]): Promise<number>;
+  findWithActors(id: string): Promise<IMovieWithActorsModel | undefined>;
 }
 
 @injectable()
@@ -103,5 +111,36 @@ export class MovieRepository implements IMovieRepository {
       .executeTakeFirst();
 
     return movie ? this.movieFactory.createMovieWithRating(movie) : undefined;
+  }
+
+  async findWithActors(id: string): Promise<IMovieWithActorsModel | undefined> {
+    const movie = await this.db
+      .selectFrom('movie')
+      .selectAll()
+      .where('movie.id', '=', id)
+      .select((eb) => [
+        jsonArrayFrom(
+          eb
+            .selectFrom('actor_movie')
+            .select(['actor_movie.actorId'])
+            .whereRef('actor_movie.movieId', '=', 'movie.id')
+        ).as('actors'),
+      ])
+      .executeTakeFirst();
+
+    return movie ? this.movieFactory.createMovieWithActors(movie) : undefined;
+  }
+
+  async addActors(actorsMovieInfo: MovieActors[]): Promise<number> {
+    try {
+      const insertedRows = await this.db
+        .insertInto('actor_movie')
+        .values(actorsMovieInfo)
+        .execute();
+
+      return Number(insertedRows[0].numInsertedOrUpdatedRows!.toString());
+    } catch (err) {
+      throw this.errorMapper.mapRepositoryError(err);
+    }
   }
 }

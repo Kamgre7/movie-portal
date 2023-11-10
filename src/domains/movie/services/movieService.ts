@@ -2,10 +2,15 @@ import { inject, injectable } from 'inversify';
 import { IMovieModel } from '../models/movieModel';
 import { NewMovie } from '../schemas/createMovieSchema';
 import { TYPES } from '../../../ioc/types/types';
-import { IMovieRepository, MovieRating } from '../repository/movieRepository';
+import {
+  IMovieRepository,
+  MovieActors,
+  MovieRating,
+} from '../repository/movieRepository';
 import { NotFoundError } from '../../../errors/notFoundError';
 import { IMovieWithRatingModel } from '../models/movieWithRatingModel';
 import { BadRequestError } from '../../../errors/badRequestError';
+import { IMovieWithActorsModel } from '../models/movieWithActorsModel';
 
 export interface IMovieService {
   create(newMovie: NewMovie): Promise<IMovieModel>;
@@ -13,6 +18,8 @@ export interface IMovieService {
   rate(movieId: string, userId: string, rating: number): Promise<MovieRating>;
   updateRate(movieId: string, userId: string, rating: number): Promise<void>;
   findWithRating(id: string): Promise<IMovieWithRatingModel>;
+  addActors(movieId: string, actorIds: string[]): Promise<number>;
+  findWithActors(id: string): Promise<IMovieWithActorsModel>;
 }
 
 @injectable()
@@ -68,5 +75,28 @@ export class MovieService implements IMovieService {
     }
 
     return movie;
+  }
+
+  async findWithActors(id: string): Promise<IMovieWithActorsModel> {
+    const movie = await this.movieRepository.findWithActors(id);
+
+    if (movie === undefined) {
+      throw new NotFoundError('Movie not found');
+    }
+
+    return movie;
+  }
+
+  async addActors(movieId: string, actorIds: string[]): Promise<number> {
+    const actorMovieIds = this.mapActorsMovie(movieId, actorIds);
+
+    return await this.movieRepository.addActors(actorMovieIds);
+  }
+
+  private mapActorsMovie(movieId: string, actorIds: string[]): MovieActors[] {
+    return actorIds.map((actorId) => ({
+      movieId,
+      actorId,
+    }));
   }
 }
