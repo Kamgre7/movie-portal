@@ -2,7 +2,7 @@ import { jsonArrayFrom } from 'kysely/helpers/postgres';
 import { inject, injectable } from 'inversify';
 import { database } from '../../../database/database';
 import { IMovieModel } from '../models/movieModel';
-import { NewMovie } from '../schemas/createMovieSchema';
+import { NewMovieWithoutActors } from '../schemas/createMovieSchema';
 import { TYPES } from '../../../ioc/types/types';
 import { IErrorMapper } from '../../../errors/errorMapper';
 import { IMovieWithRatingModel } from '../models/movieWithRatingModel';
@@ -22,7 +22,7 @@ export type MovieActors = {
 
 export interface IMovieRepository {
   findById(id: string): Promise<IMovieModel | undefined>;
-  create(newMovie: NewMovie): Promise<IMovieModel>;
+  create(newMovie: NewMovieWithoutActors): Promise<IMovieModel>;
   rate(movieId: string, userId: string, rating: number): Promise<MovieRating>;
   findWithRating(id: string): Promise<IMovieWithRatingModel | undefined>;
   updateRate(movieId: string, userId: string, rating: number): Promise<number>;
@@ -50,7 +50,7 @@ export class MovieRepository implements IMovieRepository {
     return movie ? this.movieFactory.createMovie(movie) : undefined;
   }
 
-  async create(newMovie: NewMovie): Promise<IMovieModel> {
+  async create(newMovie: NewMovieWithoutActors): Promise<IMovieModel> {
     try {
       const movie = await this.db
         .insertInto('movie')
