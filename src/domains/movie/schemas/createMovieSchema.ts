@@ -11,6 +11,7 @@ export const CreateMovieBodySchema = z.object({
     CATEGORY.THRILLER,
   ]),
   releaseDate: z.coerce.date().refine((val) => val < new Date()),
+  actors: z.array(z.string().uuid()).optional(),
 });
 
 export const CreateMovieSchema = z.object({
@@ -19,3 +20,4 @@ export const CreateMovieSchema = z.object({
 
 export type CreateMovieReq = z.infer<typeof CreateMovieSchema>;
 export type NewMovie = z.infer<typeof CreateMovieBodySchema>;
+export type NewMovieWithoutActors = Omit<NewMovie, 'actors'>;
