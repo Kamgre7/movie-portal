@@ -30,7 +30,15 @@ export class MovieService implements IMovieService {
   ) {}
 
   async create(newMovie: NewMovie): Promise<IMovieModel> {
-    return this.movieRepository.create(newMovie);
+    const { actors, ...movieInfo } = newMovie;
+
+    const movie = await this.movieRepository.create(movieInfo);
+
+    if (actors) {
+      await this.addActors(movie.id, actors);
+    }
+
+    return movie;
   }
 
   async findById(id: string): Promise<IMovieModel> {
