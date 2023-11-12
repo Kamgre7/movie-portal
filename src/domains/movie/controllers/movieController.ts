@@ -7,9 +7,14 @@ import { TYPES } from '../../../ioc/types/types';
 import { IMovieService } from '../services/movieService';
 import { RateMovieReq } from '../schemas/rateMovieSchema';
 import { AddActorMovieReq } from '../schemas/addActorsMovieSchema';
+import { FindMovieByCriteriaReq } from '../schemas/findMovieByCriteriaSchema';
 
 export interface IMovieController {
   findById(req: ParsedRequest<FindMovieByIdReq>, res: Response): Promise<void>;
+  findByCriteria(
+    req: ParsedRequest<FindMovieByCriteriaReq>,
+    res: Response
+  ): Promise<void>;
   create(req: ParsedRequest<CreateMovieReq>, res: Response): Promise<void>;
   rate(req: ParsedRequest<RateMovieReq>, res: Response): Promise<void>;
   updateRate(req: ParsedRequest<RateMovieReq>, res: Response): Promise<void>;
@@ -30,6 +35,17 @@ export class MovieController implements IMovieController {
     @inject(TYPES.MovieServiceToken)
     private readonly movieService: IMovieService
   ) {}
+
+  findByCriteria = async (
+    req: ParsedRequest<FindMovieByCriteriaReq>,
+    res: Response
+  ): Promise<void> => {
+    const movies = await this.movieService.findByCriteria(req.query);
+
+    res.status(200).json({
+      movies,
+    });
+  };
 
   findById = async (
     req: ParsedRequest<FindMovieByIdReq>,

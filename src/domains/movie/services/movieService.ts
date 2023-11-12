@@ -11,10 +11,15 @@ import { NotFoundError } from '../../../errors/notFoundError';
 import { IMovieWithRatingModel } from '../models/movieWithRatingModel';
 import { BadRequestError } from '../../../errors/badRequestError';
 import { IMovieWithActorsModel } from '../models/movieWithActorsModel';
+import {
+  MovieCriteria,
+  MovieCriteriaWithoutActors,
+} from '../schemas/findMovieByCriteriaSchema';
 
 export interface IMovieService {
   create(newMovie: NewMovie): Promise<IMovieModel>;
   findById(id: string): Promise<IMovieModel>;
+  findByCriteria(criteria: MovieCriteria): Promise<IMovieModel[]>;
   rate(movieId: string, userId: string, rating: number): Promise<MovieRating>;
   updateRate(movieId: string, userId: string, rating: number): Promise<void>;
   findWithRating(id: string): Promise<IMovieWithRatingModel>;
@@ -49,6 +54,21 @@ export class MovieService implements IMovieService {
     }
 
     return movie;
+  }
+
+  async findByCriteria(criteria: MovieCriteria): Promise<IMovieModel[]> {
+    const { actors, ...movieCriteria } = criteria;
+
+    const movies = await this.movieRepository.findByCriteria(
+      movieCriteria,
+      typeof actors === 'string' ? [actors] : actors
+    );
+
+    if (movies === undefined) {
+      throw new NotFoundError('Movies not found');
+    }
+
+    return movies;
   }
 
   async rate(

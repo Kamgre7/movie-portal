@@ -8,6 +8,10 @@ import { IErrorMapper } from '../../../errors/errorMapper';
 import { IMovieWithRatingModel } from '../models/movieWithRatingModel';
 import { IMovieFactory } from './movieFactory';
 import { IMovieWithActorsModel } from '../models/movieWithActorsModel';
+import {
+  MovieCriteria,
+  MovieCriteriaWithoutActors,
+} from '../schemas/findMovieByCriteriaSchema';
 
 export type MovieRating = {
   userId: string;
@@ -22,6 +26,10 @@ export type MovieActors = {
 
 export interface IMovieRepository {
   findById(id: string): Promise<IMovieModel | undefined>;
+  findByCriteria(
+    criteria: MovieCriteriaWithoutActors,
+    actors: string[] | undefined
+  ): Promise<IMovieModel[] | undefined>;
   create(newMovie: NewMovieWithoutActors): Promise<IMovieModel>;
   rate(movieId: string, userId: string, rating: number): Promise<MovieRating>;
   findWithRating(id: string): Promise<IMovieWithRatingModel | undefined>;
@@ -48,6 +56,35 @@ export class MovieRepository implements IMovieRepository {
       .executeTakeFirst();
 
     return movie ? this.movieFactory.createMovie(movie) : undefined;
+  }
+
+  async findByCriteria(
+    criteria: MovieCriteriaWithoutActors,
+    actors?: string[]
+  ): Promise<IMovieModel[] | undefined> {
+    const movies = await this.db
+      .selectFrom('movie')
+      .selectAll()
+      .$if(criteria.title ? true : false, (qb) =>
+        qb.where('title', 'ilike', `%${criteria.title!}%`)
+      )
+      .$if(criteria.category ? true : false, (qb) =>
+        qb.where('category', '=', criteria.category!)
+      )
+      .$if(criteria.releaseDate ? true : false, (qb) =>
+        qb.where('releaseDate', '=', criteria.releaseDate!)
+      )
+      .$if(actors ? true : false, (qb) =>
+        qb
+          .innerJoin('actor_movie', 'actor_movie.movieId', 'movie.id')
+          .where('actor_movie.actorId', 'in', actors as string[])
+      )
+      .distinctOn('id')
+      .execute();
+
+    return movies.length > 0
+      ? this.movieFactory.createManyMovie(movies)
+      : undefined;
   }
 
   async create(newMovie: NewMovieWithoutActors): Promise<IMovieModel> {

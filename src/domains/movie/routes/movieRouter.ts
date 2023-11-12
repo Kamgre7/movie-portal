@@ -7,6 +7,7 @@ import { IMovieController } from '../controllers/movieController';
 import { TYPES } from '../../../ioc/types/types';
 import { RateMovieSchema } from '../schemas/rateMovieSchema';
 import { AddActorMovieSchema } from '../schemas/addActorsMovieSchema';
+import { FindMovieByCriteriaSchema } from '../schemas/findMovieByCriteriaSchema';
 
 export const movieRouter = Router();
 
@@ -17,6 +18,13 @@ const movieController = container.get<IMovieController>(
 movieRouter
   .route('/')
   .post(requestValidator(CreateMovieSchema), movieController.create);
+
+movieRouter
+  .route('/search')
+  .get(
+    requestValidator(FindMovieByCriteriaSchema),
+    movieController.findByCriteria
+  );
 
 movieRouter
   .route('/:id/rate')
