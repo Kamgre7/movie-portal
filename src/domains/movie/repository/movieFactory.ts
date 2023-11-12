@@ -11,6 +11,7 @@ import {
 
 export interface IMovieFactory {
   createMovie(movieInfo: IMovieModel): Movie;
+  createMultipleMovie(movieInfo: IMovieModel[]): Movie[];
   createMovieWithRating(movieInfo: IMovieWithRatingModel): MovieWithRating;
   createMovieWithActors(movieInfo: IMovieWithActorsModel): MovieWithActors;
 }
@@ -21,6 +22,10 @@ export class MovieFactory implements IMovieFactory {
 
   createMovie(movieInfo: IMovieModel): Movie {
     return new Movie(movieInfo);
+  }
+
+  createMultipleMovie(movieInfo: IMovieModel[]): Movie[] {
+    return movieInfo.map((movie) => new Movie(movie));
   }
 
   createMovieWithRating(movieInfo: IMovieWithRatingModel): MovieWithRating {

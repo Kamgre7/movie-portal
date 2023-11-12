@@ -83,7 +83,7 @@ export class MovieRepository implements IMovieRepository {
       .execute();
 
     return movies.length > 0
-      ? this.movieFactory.createManyMovie(movies)
+      ? this.movieFactory.createMultipleMovie(movies)
       : undefined;
   }
 
