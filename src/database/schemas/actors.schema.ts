@@ -1,13 +1,11 @@
 import { Generated } from 'kysely';
-import { SexType } from '../../domains/user/types/sexType';
+import { GenderType } from '../../domains/user/types/genderType';
 
-export interface UserTable {
+export interface ActorsTable {
   id: Generated<string>;
-  email: string;
   firstName: string;
   lastName: string;
-  password: string;
-  gender: SexType;
+  gender: GenderType;
   createdAt: Generated<Date>;
   updatedAt: Generated<Date>;
   deletedAt: Generated<Date>;
