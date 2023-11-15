@@ -2,7 +2,7 @@ export const CATEGORY = {
   ACTION: 'action',
   COMEDY: 'comedy',
   DRAMA: 'drama',
-  FANTASY: 'Fantasy',
+  FANTASY: 'fantasy',
   THRILLER: 'thriller',
 } as const;
 
