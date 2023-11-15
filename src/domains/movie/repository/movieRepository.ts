@@ -2,16 +2,13 @@ import { jsonArrayFrom } from 'kysely/helpers/postgres';
 import { inject, injectable } from 'inversify';
 import { database } from '../../../database/database';
 import { IMovieModel } from '../models/movieModel';
-import { NewMovieWithoutActors } from '../schemas/createMovieSchema';
+import { NewMovieWithoutActors } from '../schemas/createMovieValidationSchema';
 import { TYPES } from '../../../ioc/types/types';
 import { IErrorMapper } from '../../../errors/errorMapper';
 import { IMovieWithRatingModel } from '../models/movieWithRatingModel';
-import { IMovieFactory } from './movieFactory';
 import { IMovieWithActorsModel } from '../models/movieWithActorsModel';
-import {
-  MovieCriteria,
-  MovieCriteriaWithoutActors,
-} from '../schemas/findMovieByCriteriaSchema';
+import { MovieCriteriaWithoutActors } from '../schemas/findMovieByCriteriaValdiationSchema';
+import { MovieFactory } from './movieFactory';
 
 export type MovieRating = {
   userId: string;
@@ -28,13 +25,17 @@ export interface IMovieRepository {
   findById(id: string): Promise<IMovieModel | undefined>;
   findByCriteria(
     criteria: MovieCriteriaWithoutActors,
-    actors: string[] | undefined
+    actors: string[]
   ): Promise<IMovieModel[] | undefined>;
   create(newMovie: NewMovieWithoutActors): Promise<IMovieModel>;
-  rate(movieId: string, userId: string, rating: number): Promise<MovieRating>;
+  rate(
+    movieId: string,
+    userId: string,
+    rating: number
+  ): Promise<MovieRating | void>;
   findWithRating(id: string): Promise<IMovieWithRatingModel | undefined>;
   updateRate(movieId: string, userId: string, rating: number): Promise<number>;
-  addActors(actorsMovieInfo: MovieActors[]): Promise<number>;
+  addActors(actorsMovieInfo: MovieActors[]): Promise<MovieActors[]>;
   findWithActors(id: string): Promise<IMovieWithActorsModel | undefined>;
 }
 
@@ -43,59 +44,53 @@ export class MovieRepository implements IMovieRepository {
   constructor(
     @inject(TYPES.ErrorMapperToken)
     private readonly errorMapper: IErrorMapper,
-    @inject(TYPES.MovieFactoryToken)
-    private readonly movieFactory: IMovieFactory,
     private readonly db = database
   ) {}
 
   async findById(id: string): Promise<IMovieModel | undefined> {
     const movie = await this.db
-      .selectFrom('movie')
+      .selectFrom('movies')
       .where('id', '=', id)
       .selectAll()
       .executeTakeFirst();
 
-    return movie ? this.movieFactory.createMovie(movie) : undefined;
+    return movie ? MovieFactory.createMovie(movie) : undefined;
   }
 
   async findByCriteria(
     criteria: MovieCriteriaWithoutActors,
-    actors?: string[]
+    actors: string[]
   ): Promise<IMovieModel[] | undefined> {
-    const movies = await this.db
-      .selectFrom('movie')
-      .selectAll()
-      .$if(criteria.title ? true : false, (qb) =>
-        qb.where('title', 'ilike', `%${criteria.title!}%`)
-      )
-      .$if(criteria.category ? true : false, (qb) =>
-        qb.where('category', '=', criteria.category!)
-      )
-      .$if(criteria.releaseDate ? true : false, (qb) =>
-        qb.where('releaseDate', '=', criteria.releaseDate!)
-      )
-      .$if(actors ? true : false, (qb) =>
-        qb
-          .innerJoin('actor_movie', 'actor_movie.movieId', 'movie.id')
-          .where('actor_movie.actorId', 'in', actors as string[])
-      )
-      .distinctOn('id')
-      .execute();
+    const { category, releaseDate, title } = criteria;
 
-    return movies.length > 0
-      ? this.movieFactory.createMultipleMovie(movies)
+    let query = this.db.selectFrom('movies');
+
+    if (title) query = query.where('title', 'ilike', `%${title}%`);
+    if (category) query = query.where('category', '=', category);
+    if (releaseDate) query = query.where('releaseDate', '=', releaseDate);
+
+    if (actors.length) {
+      query = query
+        .innerJoin('actors_movies', 'actors_movies.movieId', 'movies.id')
+        .where('actors_movies.actorId', 'in', actors);
+    }
+
+    const movies = await query.selectAll().distinctOn('id').execute();
+
+    return movies.length
+      ? movies.map((movie) => MovieFactory.createMovie(movie))
       : undefined;
   }
 
   async create(newMovie: NewMovieWithoutActors): Promise<IMovieModel> {
     try {
       const movie = await this.db
-        .insertInto('movie')
+        .insertInto('movies')
         .values(newMovie)
         .returningAll()
         .executeTakeFirstOrThrow();
 
-      return this.movieFactory.createMovie(movie);
+      return MovieFactory.createMovie(movie);
     } catch (err) {
       throw this.errorMapper.mapRepositoryError(err);
     }
@@ -105,14 +100,16 @@ export class MovieRepository implements IMovieRepository {
     movieId: string,
     userId: string,
     rating: number
-  ): Promise<MovieRating> {
+  ): Promise<MovieRating | void> {
     try {
-      return await this.db
-        .insertInto('user_movie_ratings')
+      const rate = await this.db
+        .insertInto('users_movies_ratings')
         .values({ userId, rating, movieId })
         .returningAll()
         .executeTakeFirstOrThrow();
-    } catch (err) {
+
+      return rate;
+    } catch (err: any) {
       throw this.errorMapper.mapRepositoryError(err);
     }
   }
@@ -122,60 +119,62 @@ export class MovieRepository implements IMovieRepository {
     userId: string,
     rating: number
   ): Promise<number> {
-    const updatedRows = await this.db
-      .updateTable('user_movie_ratings')
+    const [{ numUpdatedRows }] = await this.db
+      .updateTable('users_movies_ratings')
       .set({ rating })
       .where('movieId', '=', movieId)
       .where('userId', '=', userId)
       .execute();
 
-    return Number(updatedRows[0].numUpdatedRows.toString());
+    return Number(numUpdatedRows.toString());
   }
 
   async findWithRating(id: string): Promise<IMovieWithRatingModel | undefined> {
     const movie = await this.db
-      .selectFrom('movie')
+      .selectFrom('movies')
       .selectAll()
-      .where('movie.id', '=', id)
+      .where('movies.id', '=', id)
       .select((eb) => [
         jsonArrayFrom(
           eb
-            .selectFrom('user_movie_ratings')
-            .select(['user_movie_ratings.userId', 'user_movie_ratings.rating'])
-            .whereRef('user_movie_ratings.movieId', '=', 'movie.id')
+            .selectFrom('users_movies_ratings')
+            .select([
+              'users_movies_ratings.userId',
+              'users_movies_ratings.rating',
+            ])
+            .whereRef('users_movies_ratings.movieId', '=', 'movies.id')
         ).as('rating'),
       ])
       .executeTakeFirst();
 
-    return movie ? this.movieFactory.createMovieWithRating(movie) : undefined;
+    return movie ? MovieFactory.createMovieWithRating(movie) : undefined;
   }
 
   async findWithActors(id: string): Promise<IMovieWithActorsModel | undefined> {
     const movie = await this.db
-      .selectFrom('movie')
+      .selectFrom('movies')
       .selectAll()
-      .where('movie.id', '=', id)
+      .where('movies.id', '=', id)
       .select((eb) => [
         jsonArrayFrom(
           eb
-            .selectFrom('actor_movie')
-            .select(['actor_movie.actorId'])
-            .whereRef('actor_movie.movieId', '=', 'movie.id')
+            .selectFrom('actors_movies')
+            .select(['actors_movies.actorId'])
+            .whereRef('actors_movies.movieId', '=', 'movies.id')
         ).as('actors'),
       ])
       .executeTakeFirst();
 
-    return movie ? this.movieFactory.createMovieWithActors(movie) : undefined;
+    return movie ? MovieFactory.createMovieWithActors(movie) : undefined;
   }
 
-  async addActors(actorsMovieInfo: MovieActors[]): Promise<number> {
+  async addActors(actorsMovieInfo: MovieActors[]): Promise<MovieActors[]> {
     try {
-      const insertedRows = await this.db
-        .insertInto('actor_movie')
+      return await this.db
+        .insertInto('actors_movies')
         .values(actorsMovieInfo)
+        .returningAll()
         .execute();
-
-      return Number(insertedRows[0].numInsertedOrUpdatedRows!.toString());
     } catch (err) {
       throw this.errorMapper.mapRepositoryError(err);
     }

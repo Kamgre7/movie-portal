@@ -1,15 +1,15 @@
 import { IMovieModel, Movie } from './movieModel';
 
-export type actorsInfo = {
-  actorId: string;
-};
-
 export interface IMovieWithActorsModel extends IMovieModel {
-  actors: actorsInfo[];
+  actors: {
+    actorId: string;
+  }[];
 }
 
 export class MovieWithActors extends Movie implements IMovieWithActorsModel {
-  actors: actorsInfo[];
+  actors: {
+    actorId: string;
+  }[];
 
   constructor(movieInfo: IMovieWithActorsModel) {
     super(movieInfo);
