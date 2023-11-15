@@ -1,10 +1,10 @@
 import { z } from 'zod';
-import { SEX } from '../../user/types/sexType';
+import { GENDER } from '../../user/types/genderType';
 
 export const CreateActorBodySchema = z.object({
   firstName: z.string().min(3),
   lastName: z.string().min(3),
-  gender: z.enum([SEX.MALE, SEX.FEMALE]),
+  gender: z.nativeEnum(GENDER),
 });
 
 export const CreateActorSchema = z.object({
