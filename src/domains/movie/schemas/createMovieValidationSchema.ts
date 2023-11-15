@@ -3,13 +3,7 @@ import { CATEGORY } from '../types/categoryType';
 
 export const CreateMovieBodySchema = z.object({
   title: z.string().trim().min(2),
-  category: z.enum([
-    CATEGORY.ACTION,
-    CATEGORY.COMEDY,
-    CATEGORY.DRAMA,
-    CATEGORY.FANTASY,
-    CATEGORY.THRILLER,
-  ]),
+  category: z.nativeEnum(CATEGORY),
   releaseDate: z.coerce.date().refine((val) => val < new Date()),
   actors: z.array(z.string().uuid()).optional(),
 });

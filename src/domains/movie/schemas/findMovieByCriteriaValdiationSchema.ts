@@ -3,20 +3,12 @@ import { CATEGORY } from '../types/categoryType';
 
 export const FindMovieByCriteriaQuery = z.object({
   title: z.string().trim().min(1).optional(),
-  category: z
-    .enum([
-      CATEGORY.ACTION,
-      CATEGORY.COMEDY,
-      CATEGORY.DRAMA,
-      CATEGORY.FANTASY,
-      CATEGORY.THRILLER,
-    ])
-    .optional(),
+  category: z.nativeEnum(CATEGORY).optional(),
   releaseDate: z.coerce
     .date()
     .refine((val) => val < new Date())
     .optional(),
-  actors: z.union([z.array(z.string().uuid()), z.string().uuid()]).optional(),
+  actors: z.array(z.string().uuid()).default([]),
 });
 
 export const FindMovieByCriteriaSchema = z.object({

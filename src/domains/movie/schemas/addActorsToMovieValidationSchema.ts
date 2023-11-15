@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const AddActorMovieSchema = z.object({
+export const AddActorToMovieSchema = z.object({
   params: z.object({
     id: z.string().uuid(),
   }),
@@ -9,4 +9,4 @@ export const AddActorMovieSchema = z.object({
   }),
 });
 
-export type AddActorMovieReq = z.infer<typeof AddActorMovieSchema>;
+export type AddActorMovieReq = z.infer<typeof AddActorToMovieSchema>;
