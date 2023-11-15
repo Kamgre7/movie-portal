@@ -1,4 +1,3 @@
-import { injectable } from 'inversify';
 import { IMovieModel, Movie } from '../models/movieModel';
 import {
   IMovieWithRatingModel,
@@ -9,30 +8,22 @@ import {
   MovieWithActors,
 } from '../models/movieWithActorsModel';
 
-export interface IMovieFactory {
-  createMovie(movieInfo: IMovieModel): Movie;
-  createMultipleMovie(movieInfo: IMovieModel[]): Movie[];
-  createMovieWithRating(movieInfo: IMovieWithRatingModel): MovieWithRating;
-  createMovieWithActors(movieInfo: IMovieWithActorsModel): MovieWithActors;
-}
+export class MovieFactory {
+  private constructor() {}
 
-@injectable()
-export class MovieFactory implements IMovieFactory {
-  constructor() {}
-
-  createMovie(movieInfo: IMovieModel): Movie {
+  static createMovie(movieInfo: IMovieModel): Movie {
     return new Movie(movieInfo);
   }
 
-  createMultipleMovie(movieInfo: IMovieModel[]): Movie[] {
-    return movieInfo.map((movie) => new Movie(movie));
-  }
-
-  createMovieWithRating(movieInfo: IMovieWithRatingModel): MovieWithRating {
+  static createMovieWithRating(
+    movieInfo: IMovieWithRatingModel
+  ): MovieWithRating {
     return new MovieWithRating(movieInfo);
   }
 
-  createMovieWithActors(movieInfo: IMovieWithActorsModel): MovieWithActors {
+  static createMovieWithActors(
+    movieInfo: IMovieWithActorsModel
+  ): MovieWithActors {
     return new MovieWithActors(movieInfo);
   }
 }
