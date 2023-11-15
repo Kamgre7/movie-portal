@@ -1,13 +1,13 @@
 import { Response } from 'express';
 import { inject, injectable } from 'inversify';
 import { ParsedRequest } from '../../../apiTypes';
-import { CreateMovieReq } from '../schemas/createMovieSchema';
-import { FindMovieByIdReq } from '../schemas/findMovieByIdSchema';
+import { CreateMovieReq } from '../schemas/createMovieValidationSchema';
+import { FindMovieByIdReq } from '../schemas/findMovieByIdValidationSchema';
 import { TYPES } from '../../../ioc/types/types';
 import { IMovieService } from '../services/movieService';
-import { RateMovieReq } from '../schemas/rateMovieSchema';
-import { AddActorMovieReq } from '../schemas/addActorsMovieSchema';
-import { FindMovieByCriteriaReq } from '../schemas/findMovieByCriteriaSchema';
+import { RateMovieReq } from '../schemas/rateMovieValidationSchema';
+import { AddActorMovieReq } from '../schemas/addActorsToMovieValidationSchema';
+import { FindMovieByCriteriaReq } from '../schemas/findMovieByCriteriaValdiationSchema';
 
 export interface IMovieController {
   findById(req: ParsedRequest<FindMovieByIdReq>, res: Response): Promise<void>;
@@ -89,10 +89,10 @@ export class MovieController implements IMovieController {
     const { id } = req.params;
     const { rate, userId } = req.body;
 
-    const movieInfo = await this.movieService.rate(id, userId, rate);
+    const ratingInfo = await this.movieService.rate(id, userId, rate);
 
     res.status(201).json({
-      movieInfo,
+      ratingInfo,
     });
   };
 
@@ -120,13 +120,13 @@ export class MovieController implements IMovieController {
   };
 
   addActors = async (req: ParsedRequest<AddActorMovieReq>, res: Response) => {
-    const insertedRows = await this.movieService.addActors(
+    const movieActors = await this.movieService.addActors(
       req.params.id,
       req.body.actorIds
     );
 
     res.status(201).json({
-      insertedRows,
+      movieActors,
     });
   };
 }

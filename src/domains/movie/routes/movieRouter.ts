@@ -1,13 +1,13 @@
 import { Router } from 'express';
 import { requestValidator } from '../../../middlewares/requestValidator';
-import { CreateMovieSchema } from '../schemas/createMovieSchema';
-import { FindMovieByIdSchema } from '../schemas/findMovieByIdSchema';
+import { CreateMovieSchema } from '../schemas/createMovieValidationSchema';
+import { FindMovieByIdSchema } from '../schemas/findMovieByIdValidationSchema';
 import { container } from '../../../ioc/inversify.config';
 import { IMovieController } from '../controllers/movieController';
 import { TYPES } from '../../../ioc/types/types';
-import { RateMovieSchema } from '../schemas/rateMovieSchema';
-import { AddActorMovieSchema } from '../schemas/addActorsMovieSchema';
-import { FindMovieByCriteriaSchema } from '../schemas/findMovieByCriteriaSchema';
+import { RateMovieSchema } from '../schemas/rateMovieValidationSchema';
+import { AddActorToMovieSchema } from '../schemas/addActorsToMovieValidationSchema';
+import { FindMovieByCriteriaSchema } from '../schemas/findMovieByCriteriaValdiationSchema';
 
 export const movieRouter = Router();
 
@@ -35,7 +35,7 @@ movieRouter
 movieRouter
   .route('/:id/actors')
   .get(requestValidator(FindMovieByIdSchema), movieController.findWithActors)
-  .post(requestValidator(AddActorMovieSchema), movieController.addActors);
+  .post(requestValidator(AddActorToMovieSchema), movieController.addActors);
 
 movieRouter
   .route('/:id')
