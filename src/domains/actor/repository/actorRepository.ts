@@ -1,12 +1,15 @@
 import { inject, injectable } from 'inversify';
-import { Actor, IActorModel } from '../models/actorModel';
-import { NewActor } from '../schemas/createActorSchema';
+import { IActorModel } from '../models/actorModel';
+import { NewActor } from '../schemas/createActorValidationSchema';
 import { database } from '../../../database/database';
 import { TYPES } from '../../../ioc/types/types';
 import { IErrorMapper } from '../../../errors/errorMapper';
+import { ActorFactory } from './actorFactory';
+import { ActorCriteria } from '../schemas/findActorValidationSchema';
 
 export interface IActorRepository {
   findById(id: string): Promise<IActorModel | undefined>;
+  findByCriteria(criteria: ActorCriteria): Promise<IActorModel[] | undefined>;
   create(newActor: NewActor): Promise<IActorModel>;
 }
 
@@ -20,26 +23,41 @@ export class ActorRepository implements IActorRepository {
 
   async findById(id: string): Promise<IActorModel | undefined> {
     const actor = await this.db
-      .selectFrom('actor')
+      .selectFrom('actors')
       .where('id', '=', id)
       .selectAll()
       .executeTakeFirst();
 
-    return actor
-      ? [actor].map((actorModel) => new Actor(actorModel))[0]
+    return actor ? ActorFactory.createActor(actor) : undefined;
+  }
+
+  async findByCriteria(
+    criteria: ActorCriteria
+  ): Promise<IActorModel[] | undefined> {
+    const { firstName, lastName } = criteria;
+
+    let query = this.db.selectFrom('actors');
+
+    if (firstName) query = query.where('firstName', 'ilike', `%${firstName}%`);
+    if (lastName) query = query.where('lastName', 'ilike', `%${lastName}%`);
+
+    const actors = await query.selectAll().execute();
+
+    return actors.length
+      ? actors.map((actor) => ActorFactory.createActor(actor))
       : undefined;
   }
 
   async create(newActor: NewActor): Promise<IActorModel> {
     try {
       const actor = await this.db
-        .insertInto('actor')
+        .insertInto('actors')
         .values(newActor)
         .returningAll()
         .executeTakeFirstOrThrow();
 
-      return [actor].map((actorModel) => new Actor(actorModel))[0];
-    } catch (err: any) {
+      return ActorFactory.createActor(actor);
+    } catch (err) {
       throw this.errorMapper.mapRepositoryError(err);
     }
   }
