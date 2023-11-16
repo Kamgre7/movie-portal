@@ -1,10 +1,10 @@
-import { SexType } from '../../user/types/sexType';
+import { GenderType } from '../../user/types/genderType';
 
 export interface IActorModel {
   id: string;
   firstName: string;
   lastName: string;
-  gender: SexType;
+  gender: GenderType;
   createdAt: Date;
   updatedAt: Date;
   deletedAt: Date | null;
@@ -14,7 +14,7 @@ export class Actor implements IActorModel {
   id: string;
   firstName: string;
   lastName: string;
-  gender: SexType;
+  gender: GenderType;
   createdAt: Date;
   updatedAt: Date;
   deletedAt: Date | null;
