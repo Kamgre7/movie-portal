@@ -4,20 +4,12 @@ import { CATEGORY } from '../../domains/movie/types/categoryType';
 export async function up(db: Kysely<any>): Promise<void> {
   await db.schema
     .createType('MovieCategory')
-    .asEnum([
-      CATEGORY.ACTION,
-      CATEGORY.COMEDY,
-      CATEGORY.DRAMA,
-      CATEGORY.FANTASY,
-      CATEGORY.THRILLER,
-    ])
+    .asEnum([CATEGORY.ACTION, CATEGORY.COMEDY, CATEGORY.DRAMA, CATEGORY.FANTASY, CATEGORY.THRILLER])
     .execute();
 
   await db.schema
     .createTable('movies')
-    .addColumn('id', 'uuid', (col) =>
-      col.primaryKey().defaultTo(sql`gen_random_uuid()`)
-    )
+    .addColumn('id', 'uuid', (col) => col.primaryKey().defaultTo(sql`gen_random_uuid()`))
     .addColumn('title', 'varchar(50)', (col) => col.unique().notNull())
     .addColumn('category', sql`"MovieCategory"`, (col) => col.notNull())
     .addColumn('releaseDate', 'timestamp', (col) => col.notNull())

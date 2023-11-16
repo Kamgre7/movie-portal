@@ -8,14 +8,8 @@ import { FindUserByIdSchema } from '../schemas/findUserByIdValidationSchema';
 
 export const userRouter = Router();
 
-const userController = container.get<IUserController>(
-  TYPES.UserControllerToken
-);
+const userController = container.get<IUserController>(TYPES.UserControllerToken);
 
-userRouter
-  .route('/')
-  .post(requestValidator(CreateUserSchema), userController.create);
+userRouter.route('/').post(requestValidator(CreateUserSchema), userController.create);
 
-userRouter
-  .route('/:id')
-  .get(requestValidator(FindUserByIdSchema), userController.findById);
+userRouter.route('/:id').get(requestValidator(FindUserByIdSchema), userController.findById);

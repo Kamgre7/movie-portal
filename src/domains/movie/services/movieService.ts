@@ -58,10 +58,7 @@ export class MovieService implements IMovieService {
   async findByCriteria(criteria: MovieCriteria): Promise<IMovieModel[]> {
     const { actors, ...movieCriteria } = criteria;
 
-    const movies = await this.movieRepository.findByCriteria(
-      movieCriteria,
-      actors
-    );
+    const movies = await this.movieRepository.findByCriteria(movieCriteria, actors);
 
     if (!movies) {
       throw new NotFoundError('Movies not found');

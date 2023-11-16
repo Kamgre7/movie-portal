@@ -1,6 +1,6 @@
 import 'reflect-metadata';
-import express, { Application } from 'express';
 import 'express-async-errors';
+import express, { Application } from 'express';
 import { appConfig } from './config/appConfig';
 import { errorHandler } from './middlewares/errorHandler';
 import { mainRouter } from './routes/mainRouter';
@@ -31,9 +31,7 @@ export class Bootstrap {
 
   private startServer(): void {
     this.app.listen(appConfig.port, () => {
-      console.log(
-        `Application is running on ${appConfig.host}:${appConfig.port}`
-      );
+      console.log(`Application is running on ${appConfig.host}:${appConfig.port}`);
     });
   }
 }

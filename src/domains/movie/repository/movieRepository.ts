@@ -31,10 +31,7 @@ export interface IMovieRepository {
     criteria: MovieCriteriaWithoutActors,
     actors: string[]
   ): Promise<IMovieModel[] | undefined>;
-  findActorInMovie(
-    actorId: string,
-    movieId: string
-  ): Promise<MovieActors | undefined>;
+  findActorInMovie(actorId: string, movieId: string): Promise<MovieActors | undefined>;
   create(newMovie: NewMovieWithoutActors): Promise<IMovieModel>;
   rate(movieRating: MovieRating): Promise<MovieRating>;
   rateActor(rateInfo: MovieActorsRating): Promise<MovieActorsRating>;
@@ -82,15 +79,10 @@ export class MovieRepository implements IMovieRepository {
 
     const movies = await query.selectAll().distinctOn('id').execute();
 
-    return movies.length
-      ? movies.map((movie) => MovieFactory.createMovie(movie))
-      : undefined;
+    return movies.length ? movies.map((movie) => MovieFactory.createMovie(movie)) : undefined;
   }
 
-  async findActorInMovie(
-    actorId: string,
-    movieId: string
-  ): Promise<MovieActors | undefined> {
+  async findActorInMovie(actorId: string, movieId: string): Promise<MovieActors | undefined> {
     const actorMovie = await this.db
       .selectFrom('actors_movies')
       .where('actors_movies.actorId', '=', actorId)
@@ -165,10 +157,7 @@ export class MovieRepository implements IMovieRepository {
         jsonArrayFrom(
           eb
             .selectFrom('users_movies_ratings')
-            .select([
-              'users_movies_ratings.userId',
-              'users_movies_ratings.rating',
-            ])
+            .select(['users_movies_ratings.userId', 'users_movies_ratings.rating'])
             .whereRef('users_movies_ratings.movieId', '=', 'movies.id')
         ).as('rating'),
       ])

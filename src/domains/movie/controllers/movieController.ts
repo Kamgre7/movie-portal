@@ -12,21 +12,12 @@ import { RateActorReq } from '../schemas/rateActorValidationSchema';
 
 export interface IMovieController {
   findById(req: ParsedRequest<FindMovieByIdReq>, res: Response): Promise<void>;
-  findByCriteria(
-    req: ParsedRequest<FindMovieByCriteriaReq>,
-    res: Response
-  ): Promise<void>;
+  findByCriteria(req: ParsedRequest<FindMovieByCriteriaReq>, res: Response): Promise<void>;
   create(req: ParsedRequest<CreateMovieReq>, res: Response): Promise<void>;
   rate(req: ParsedRequest<RateMovieReq>, res: Response): Promise<void>;
   updateRate(req: ParsedRequest<RateMovieReq>, res: Response): Promise<void>;
-  findWithRating(
-    req: ParsedRequest<FindMovieByIdReq>,
-    res: Response
-  ): Promise<void>;
-  findWithActors(
-    req: ParsedRequest<FindMovieByIdReq>,
-    res: Response
-  ): Promise<void>;
+  findWithRating(req: ParsedRequest<FindMovieByIdReq>, res: Response): Promise<void>;
+  findWithActors(req: ParsedRequest<FindMovieByIdReq>, res: Response): Promise<void>;
   rateActor(req: ParsedRequest<RateActorReq>, res: Response): Promise<void>;
   addActors(req: ParsedRequest<AddActorMovieReq>, res: Response): Promise<void>;
 }
@@ -49,10 +40,7 @@ export class MovieController implements IMovieController {
     });
   };
 
-  findById = async (
-    req: ParsedRequest<FindMovieByIdReq>,
-    res: Response
-  ): Promise<void> => {
+  findById = async (req: ParsedRequest<FindMovieByIdReq>, res: Response): Promise<void> => {
     const movie = await this.movieService.findById(req.params.id);
 
     res.status(200).json({
@@ -60,10 +48,7 @@ export class MovieController implements IMovieController {
     });
   };
 
-  create = async (
-    req: ParsedRequest<CreateMovieReq>,
-    res: Response
-  ): Promise<void> => {
+  create = async (req: ParsedRequest<CreateMovieReq>, res: Response): Promise<void> => {
     const movie = await this.movieService.create(req.body);
 
     res.status(201).json({
@@ -71,10 +56,7 @@ export class MovieController implements IMovieController {
     });
   };
 
-  findWithRating = async (
-    req: ParsedRequest<FindMovieByIdReq>,
-    res: Response
-  ): Promise<void> => {
+  findWithRating = async (req: ParsedRequest<FindMovieByIdReq>, res: Response): Promise<void> => {
     const movie = await this.movieService.findWithRating(req.params.id);
 
     res.status(200).json({
@@ -82,10 +64,7 @@ export class MovieController implements IMovieController {
     });
   };
 
-  rate = async (
-    req: ParsedRequest<RateMovieReq>,
-    res: Response
-  ): Promise<void> => {
+  rate = async (req: ParsedRequest<RateMovieReq>, res: Response): Promise<void> => {
     const rating = {
       movieId: req.params.id,
       ...req.body,
@@ -98,10 +77,7 @@ export class MovieController implements IMovieController {
     });
   };
 
-  updateRate = async (
-    req: ParsedRequest<RateMovieReq>,
-    res: Response
-  ): Promise<void> => {
+  updateRate = async (req: ParsedRequest<RateMovieReq>, res: Response): Promise<void> => {
     const rating = {
       movieId: req.params.id,
       ...req.body,
@@ -112,10 +88,7 @@ export class MovieController implements IMovieController {
     res.status(204).end();
   };
 
-  findWithActors = async (
-    req: ParsedRequest<FindMovieByIdReq>,
-    res: Response
-  ) => {
+  findWithActors = async (req: ParsedRequest<FindMovieByIdReq>, res: Response) => {
     const movie = await this.movieService.findWithActors(req.params.id);
 
     res.status(200).json({
@@ -123,10 +96,7 @@ export class MovieController implements IMovieController {
     });
   };
 
-  rateActor = async (
-    req: ParsedRequest<RateActorReq>,
-    res: Response
-  ): Promise<void> => {
+  rateActor = async (req: ParsedRequest<RateActorReq>, res: Response): Promise<void> => {
     const rating = {
       ...req.params,
       ...req.body,
@@ -140,10 +110,7 @@ export class MovieController implements IMovieController {
   };
 
   addActors = async (req: ParsedRequest<AddActorMovieReq>, res: Response) => {
-    const movieActors = await this.movieService.addActors(
-      req.params.id,
-      req.body.actorIds
-    );
+    const movieActors = await this.movieService.addActors(req.params.id, req.body.actorIds);
 
     res.status(201).json({
       movieActors,

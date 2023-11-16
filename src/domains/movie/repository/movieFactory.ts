@@ -1,12 +1,6 @@
 import { IMovieModel, Movie } from '../models/movieModel';
-import {
-  IMovieWithRatingModel,
-  MovieWithRating,
-} from '../models/movieWithRatingModel';
-import {
-  IMovieWithActorsModel,
-  MovieWithActors,
-} from '../models/movieWithActorsModel';
+import { IMovieWithRatingModel, MovieWithRating } from '../models/movieWithRatingModel';
+import { IMovieWithActorsModel, MovieWithActors } from '../models/movieWithActorsModel';
 
 export class MovieFactory {
   private constructor() {}
@@ -15,15 +9,11 @@ export class MovieFactory {
     return new Movie(movieInfo);
   }
 
-  static createMovieWithRating(
-    movieInfo: IMovieWithRatingModel
-  ): MovieWithRating {
+  static createMovieWithRating(movieInfo: IMovieWithRatingModel): MovieWithRating {
     return new MovieWithRating(movieInfo);
   }
 
-  static createMovieWithActors(
-    movieInfo: IMovieWithActorsModel
-  ): MovieWithActors {
+  static createMovieWithActors(movieInfo: IMovieWithActorsModel): MovieWithActors {
     return new MovieWithActors(movieInfo);
   }
 }

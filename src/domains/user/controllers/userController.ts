@@ -18,10 +18,7 @@ export class UserController implements IUserController {
     private readonly userService: IUserService
   ) {}
 
-  findById = async (
-    req: ParsedRequest<FindUserByIdReq>,
-    res: Response
-  ): Promise<void> => {
+  findById = async (req: ParsedRequest<FindUserByIdReq>, res: Response): Promise<void> => {
     const user = await this.userService.findById(req.params.id);
 
     res.status(200).json({
@@ -29,10 +26,7 @@ export class UserController implements IUserController {
     });
   };
 
-  create = async (
-    req: ParsedRequest<CreateUserReq>,
-    res: Response
-  ): Promise<void> => {
+  create = async (req: ParsedRequest<CreateUserReq>, res: Response): Promise<void> => {
     const user = await this.userService.create(req.body);
 
     res.status(201).json({

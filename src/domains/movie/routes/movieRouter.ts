@@ -12,20 +12,13 @@ import { RateActorSchema } from '../schemas/rateActorValidationSchema';
 
 export const movieRouter = Router();
 
-const movieController = container.get<IMovieController>(
-  TYPES.MovieControllerToken
-);
+const movieController = container.get<IMovieController>(TYPES.MovieControllerToken);
 
-movieRouter
-  .route('/')
-  .post(requestValidator(CreateMovieSchema), movieController.create);
+movieRouter.route('/').post(requestValidator(CreateMovieSchema), movieController.create);
 
 movieRouter
   .route('/search')
-  .get(
-    requestValidator(FindMovieByCriteriaSchema),
-    movieController.findByCriteria
-  );
+  .get(requestValidator(FindMovieByCriteriaSchema), movieController.findByCriteria);
 
 movieRouter
   .route('/:id/rate')
@@ -42,6 +35,4 @@ movieRouter
   .route('/:movieId/rate/actors/:actorId')
   .post(requestValidator(RateActorSchema), movieController.rateActor);
 
-movieRouter
-  .route('/:id')
-  .get(requestValidator(FindMovieByIdSchema), movieController.findById);
+movieRouter.route('/:id').get(requestValidator(FindMovieByIdSchema), movieController.findById);

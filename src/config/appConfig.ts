@@ -1,9 +1,7 @@
 import { z } from 'zod';
 
 export const AppSchema = z.object({
-  port: z
-    .string()
-    .transform((arg) => (isNaN(parseInt(arg)) ? 3000 : Number(arg))),
+  port: z.string().transform((arg) => (isNaN(parseInt(arg)) ? 3000 : Number(arg))),
   host: z.string().min(1),
   hostName: z.string().min(1),
 });

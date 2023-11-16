@@ -31,9 +31,7 @@ export class ActorRepository implements IActorRepository {
     return actor ? ActorFactory.createActor(actor) : undefined;
   }
 
-  async findByCriteria(
-    criteria: ActorCriteria
-  ): Promise<IActorModel[] | undefined> {
+  async findByCriteria(criteria: ActorCriteria): Promise<IActorModel[] | undefined> {
     const { firstName, lastName } = criteria;
 
     let query = this.db.selectFrom('actors');
@@ -43,9 +41,7 @@ export class ActorRepository implements IActorRepository {
 
     const actors = await query.selectAll().execute();
 
-    return actors.length
-      ? actors.map((actor) => ActorFactory.createActor(actor))
-      : undefined;
+    return actors.length ? actors.map((actor) => ActorFactory.createActor(actor)) : undefined;
   }
 
   async create(newActor: NewActor): Promise<IActorModel> {
