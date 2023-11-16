@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { SEX } from '../types/sexType';
+import { GENDER } from '../types/genderType';
 
 // Minimum eight characters, at least one uppercase, one lowercase character, one number and one special character
 const passwordRegex =
@@ -10,7 +10,7 @@ export const CreateUserBodySchema = z.object({
   firstName: z.string().min(3),
   lastName: z.string().min(3),
   password: z.string().regex(passwordRegex),
-  gender: z.enum([SEX.MALE, SEX.FEMALE]),
+  gender: z.nativeEnum(GENDER),
 });
 
 export const CreateUserSchema = z.object({

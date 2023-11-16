@@ -3,8 +3,8 @@ import { inject, injectable } from 'inversify';
 import { TYPES } from '../../../ioc/types/types';
 import { IUserService } from '../services/userService';
 import { ParsedRequest } from '../../../apiTypes';
-import { CreateUserReq } from '../schemas/createUserSchema';
-import { FindUserByIdReq } from '../schemas/findUserByIdSchema';
+import { CreateUserReq } from '../schemas/createUserValidationSchema';
+import { FindUserByIdReq } from '../schemas/findUserByIdValidationSchema';
 
 export interface IUserController {
   findById(req: ParsedRequest<FindUserByIdReq>, res: Response): Promise<void>;
@@ -33,9 +33,7 @@ export class UserController implements IUserController {
     req: ParsedRequest<CreateUserReq>,
     res: Response
   ): Promise<void> => {
-    const { body } = req;
-
-    const user = await this.userService.create(body);
+    const user = await this.userService.create(req.body);
 
     res.status(201).json({
       user,

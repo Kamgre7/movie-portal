@@ -2,7 +2,7 @@ import { inject, injectable } from 'inversify';
 import { TYPES } from '../../../ioc/types/types';
 import { IPasswordManager } from '../../passwordManager/passwordManager';
 import { IUserRepository } from '../repository/userRepository';
-import { NewUser } from '../schemas/createUserSchema';
+import { NewUser } from '../schemas/createUserValidationSchema';
 import { IUserModel } from '../models/userModel';
 import { NotFoundError } from '../../../errors/notFoundError';
 
@@ -38,7 +38,7 @@ export class UserService implements IUserService {
   async findById(id: string): Promise<IUserModel> {
     const user = await this.userRepository.findById(id);
 
-    if (user === undefined) {
+    if (!user) {
       throw new NotFoundError('User not found');
     }
 

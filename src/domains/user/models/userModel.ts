@@ -1,4 +1,4 @@
-import { SexType } from '../types/sexType';
+import { GenderType } from '../types/genderType';
 
 export interface IUserModel {
   id: string;
@@ -6,7 +6,7 @@ export interface IUserModel {
   firstName: string;
   lastName: string;
   password: string;
-  gender: SexType;
+  gender: GenderType;
   createdAt: Date;
   updatedAt: Date;
   deletedAt: Date | null;
@@ -18,7 +18,7 @@ export class User implements IUserModel {
   firstName: string;
   lastName: string;
   password: string;
-  gender: SexType;
+  gender: GenderType;
   createdAt: Date;
   updatedAt: Date;
   deletedAt: Date | null;
