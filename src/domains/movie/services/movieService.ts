@@ -5,6 +5,7 @@ import { TYPES } from '../../../ioc/types/types';
 import {
   IMovieRepository,
   MovieActors,
+  MovieActorsRating,
   MovieRating,
 } from '../repository/movieRepository';
 import { NotFoundError } from '../../../errors/notFoundError';
@@ -17,9 +18,10 @@ export interface IMovieService {
   create(newMovie: NewMovie): Promise<IMovieModel>;
   findById(id: string): Promise<IMovieModel>;
   findByCriteria(criteria: MovieCriteria): Promise<IMovieModel[]>;
-  rate(movieId: string, userId: string, rating: number): Promise<MovieRating>;
-  updateRate(movieId: string, userId: string, rating: number): Promise<void>;
+  rate(movieRating: MovieRating): Promise<MovieRating>;
+  updateRate(movieRating: MovieRating): Promise<void>;
   findWithRating(id: string): Promise<IMovieWithRatingModel>;
+  rateActor(rateInfo: MovieActorsRating): Promise<MovieActorsRating>;
   addActors(movieId: string, actorIds: string[]): Promise<MovieActors[]>;
   findWithActors(id: string): Promise<IMovieWithActorsModel>;
 }
@@ -68,28 +70,31 @@ export class MovieService implements IMovieService {
     return movies;
   }
 
-  async rate(
-    movieId: string,
-    userId: string,
-    rating: number
-  ): Promise<MovieRating> {
-    await this.findById(movieId);
+  async rate(movieRating: MovieRating): Promise<MovieRating> {
+    await this.findById(movieRating.movieId);
 
-    const rateInfo = await this.movieRepository.rate(movieId, userId, rating);
+    const rateInfo = await this.movieRepository.rate(movieRating);
 
-    return rateInfo!;
+    return rateInfo;
   }
 
-  async updateRate(
-    movieId: string,
-    userId: string,
-    rating: number
-  ): Promise<void> {
-    const updatedRows = await this.movieRepository.updateRate(
-      movieId,
-      userId,
-      rating
+  async rateActor(rateInfo: MovieActorsRating): Promise<MovieActorsRating> {
+    const actorMovie = await this.movieRepository.findActorInMovie(
+      rateInfo.actorId,
+      rateInfo.movieId
     );
+
+    if (!actorMovie) {
+      throw new NotFoundError('Actor or movie not found');
+    }
+
+    const rating = await this.movieRepository.rateActor(rateInfo);
+
+    return rating;
+  }
+
+  async updateRate(movieRating: MovieRating): Promise<void> {
+    const updatedRows = await this.movieRepository.updateRate(movieRating);
 
     if (!updatedRows) {
       throw new BadRequestError('No rate updated');

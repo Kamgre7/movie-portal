@@ -21,20 +21,25 @@ export type MovieActors = {
   actorId: string;
 };
 
+export type MovieActorsRating = MovieRating & {
+  actorId: string;
+};
+
 export interface IMovieRepository {
   findById(id: string): Promise<IMovieModel | undefined>;
   findByCriteria(
     criteria: MovieCriteriaWithoutActors,
     actors: string[]
   ): Promise<IMovieModel[] | undefined>;
+  findActorInMovie(
+    actorId: string,
+    movieId: string
+  ): Promise<MovieActors | undefined>;
   create(newMovie: NewMovieWithoutActors): Promise<IMovieModel>;
-  rate(
-    movieId: string,
-    userId: string,
-    rating: number
-  ): Promise<MovieRating | void>;
+  rate(movieRating: MovieRating): Promise<MovieRating>;
+  rateActor(rateInfo: MovieActorsRating): Promise<MovieActorsRating>;
   findWithRating(id: string): Promise<IMovieWithRatingModel | undefined>;
-  updateRate(movieId: string, userId: string, rating: number): Promise<number>;
+  updateRate(movieRating: MovieRating): Promise<number>;
   addActors(actorsMovieInfo: MovieActors[]): Promise<MovieActors[]>;
   findWithActors(id: string): Promise<IMovieWithActorsModel | undefined>;
 }
@@ -82,6 +87,20 @@ export class MovieRepository implements IMovieRepository {
       : undefined;
   }
 
+  async findActorInMovie(
+    actorId: string,
+    movieId: string
+  ): Promise<MovieActors | undefined> {
+    const actorMovie = await this.db
+      .selectFrom('actors_movies')
+      .where('actors_movies.actorId', '=', actorId)
+      .where('actors_movies.movieId', '=', movieId)
+      .selectAll()
+      .executeTakeFirst();
+
+    return actorMovie ?? undefined;
+  }
+
   async create(newMovie: NewMovieWithoutActors): Promise<IMovieModel> {
     try {
       const movie = await this.db
@@ -96,29 +115,37 @@ export class MovieRepository implements IMovieRepository {
     }
   }
 
-  async rate(
-    movieId: string,
-    userId: string,
-    rating: number
-  ): Promise<MovieRating | void> {
+  async rate(movieRating: MovieRating): Promise<MovieRating> {
     try {
       const rate = await this.db
         .insertInto('users_movies_ratings')
-        .values({ userId, rating, movieId })
+        .values(movieRating)
         .returningAll()
         .executeTakeFirstOrThrow();
 
       return rate;
-    } catch (err: any) {
+    } catch (err) {
       throw this.errorMapper.mapRepositoryError(err);
     }
   }
 
-  async updateRate(
-    movieId: string,
-    userId: string,
-    rating: number
-  ): Promise<number> {
+  async rateActor(rateInfo: MovieActorsRating): Promise<MovieActorsRating> {
+    try {
+      const rate = await this.db
+        .insertInto('users_actors_ratings')
+        .values(rateInfo)
+        .returningAll()
+        .executeTakeFirstOrThrow();
+
+      return rate;
+    } catch (err) {
+      throw this.errorMapper.mapRepositoryError(err);
+    }
+  }
+
+  async updateRate(movieRating: MovieRating): Promise<number> {
+    const { movieId, rating, userId } = movieRating;
+
     const [{ numUpdatedRows }] = await this.db
       .updateTable('users_movies_ratings')
       .set({ rating })

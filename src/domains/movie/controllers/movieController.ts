@@ -8,6 +8,7 @@ import { IMovieService } from '../services/movieService';
 import { RateMovieReq } from '../schemas/rateMovieValidationSchema';
 import { AddActorMovieReq } from '../schemas/addActorsToMovieValidationSchema';
 import { FindMovieByCriteriaReq } from '../schemas/findMovieByCriteriaValdiationSchema';
+import { RateActorReq } from '../schemas/rateActorValidationSchema';
 
 export interface IMovieController {
   findById(req: ParsedRequest<FindMovieByIdReq>, res: Response): Promise<void>;
@@ -26,6 +27,7 @@ export interface IMovieController {
     req: ParsedRequest<FindMovieByIdReq>,
     res: Response
   ): Promise<void>;
+  rateActor(req: ParsedRequest<RateActorReq>, res: Response): Promise<void>;
   addActors(req: ParsedRequest<AddActorMovieReq>, res: Response): Promise<void>;
 }
 
@@ -62,9 +64,7 @@ export class MovieController implements IMovieController {
     req: ParsedRequest<CreateMovieReq>,
     res: Response
   ): Promise<void> => {
-    const { body } = req;
-
-    const movie = await this.movieService.create(body);
+    const movie = await this.movieService.create(req.body);
 
     res.status(201).json({
       movie,
@@ -86,10 +86,12 @@ export class MovieController implements IMovieController {
     req: ParsedRequest<RateMovieReq>,
     res: Response
   ): Promise<void> => {
-    const { id } = req.params;
-    const { rate, userId } = req.body;
+    const rating = {
+      movieId: req.params.id,
+      ...req.body,
+    };
 
-    const ratingInfo = await this.movieService.rate(id, userId, rate);
+    const ratingInfo = await this.movieService.rate(rating);
 
     res.status(201).json({
       ratingInfo,
@@ -100,10 +102,12 @@ export class MovieController implements IMovieController {
     req: ParsedRequest<RateMovieReq>,
     res: Response
   ): Promise<void> => {
-    const { id } = req.params;
-    const { rate, userId } = req.body;
+    const rating = {
+      movieId: req.params.id,
+      ...req.body,
+    };
 
-    await this.movieService.updateRate(id, userId, rate);
+    await this.movieService.updateRate(rating);
 
     res.status(204).end();
   };
@@ -116,6 +120,22 @@ export class MovieController implements IMovieController {
 
     res.status(200).json({
       movie,
+    });
+  };
+
+  rateActor = async (
+    req: ParsedRequest<RateActorReq>,
+    res: Response
+  ): Promise<void> => {
+    const rating = {
+      ...req.params,
+      ...req.body,
+    };
+
+    const rateInfo = await this.movieService.rateActor(rating);
+
+    res.status(201).json({
+      rateInfo,
     });
   };
 

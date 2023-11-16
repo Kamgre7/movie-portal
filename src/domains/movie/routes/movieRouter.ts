@@ -8,6 +8,7 @@ import { TYPES } from '../../../ioc/types/types';
 import { RateMovieSchema } from '../schemas/rateMovieValidationSchema';
 import { AddActorToMovieSchema } from '../schemas/addActorsToMovieValidationSchema';
 import { FindMovieByCriteriaSchema } from '../schemas/findMovieByCriteriaValdiationSchema';
+import { RateActorSchema } from '../schemas/rateActorValidationSchema';
 
 export const movieRouter = Router();
 
@@ -36,6 +37,10 @@ movieRouter
   .route('/:id/actors')
   .get(requestValidator(FindMovieByIdSchema), movieController.findWithActors)
   .post(requestValidator(AddActorToMovieSchema), movieController.addActors);
+
+movieRouter
+  .route('/:movieId/rate/actors/:actorId')
+  .post(requestValidator(RateActorSchema), movieController.rateActor);
 
 movieRouter
   .route('/:id')
