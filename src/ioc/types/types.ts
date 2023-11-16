@@ -4,9 +4,7 @@ export const TYPES = {
   UserRepositoryToken: Symbol.for('IUserRepository'),
   UserServiceToken: Symbol.for('IUserService'),
   UserControllerToken: Symbol.for('IUserController'),
-  UserFactoryToken: Symbol.for('IUserFactory'),
 
-  MovieFactoryToken: Symbol.for('IMovieFactory'),
   MovieRepositoryToken: Symbol.for('IMovieRepository'),
   MovieServiceToken: Symbol.for('IMovieService'),
   MovieControllerToken: Symbol.for('IMovieController'),

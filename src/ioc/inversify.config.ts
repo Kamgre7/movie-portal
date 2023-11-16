@@ -40,15 +40,7 @@ import {
   ActorController,
   IActorController,
 } from '../domains/actor/controllers/actorController';
-import {
-  IUserFactory,
-  UserFactory,
-} from '../domains/user/repository/userFactory';
 import { ErrorMapper, IErrorMapper } from '../errors/errorMapper';
-import {
-  IMovieFactory,
-  MovieFactory,
-} from '../domains/movie/repository/movieFactory';
 
 export const container = new Container();
 
@@ -60,8 +52,6 @@ container
 
 // user
 
-container.bind<IUserFactory>(TYPES.UserFactoryToken).to(UserFactory);
-
 container.bind<IUserService>(TYPES.UserServiceToken).to(UserService);
 
 container.bind<IUserRepository>(TYPES.UserRepositoryToken).to(UserRepository);
@@ -69,8 +59,6 @@ container.bind<IUserRepository>(TYPES.UserRepositoryToken).to(UserRepository);
 container.bind<IUserController>(TYPES.UserControllerToken).to(UserController);
 
 // movie
-
-container.bind<IMovieFactory>(TYPES.MovieFactoryToken).to(MovieFactory);
 
 container
   .bind<IMovieRepository>(TYPES.MovieRepositoryToken)
