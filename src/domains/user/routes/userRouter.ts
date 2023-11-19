@@ -5,6 +5,7 @@ import { TYPES } from '../../../ioc/types/types';
 import { requestValidator } from '../../../middlewares/requestValidator';
 import { CreateUserSchema } from '../schemas/createUserValidationSchema';
 import { FindUserByIdSchema } from '../schemas/findUserByIdValidationSchema';
+import { AddMovieToWatchListSchema } from '../schemas/addMovieToWatchListValidationSchema';
 
 export const userRouter = Router();
 
@@ -13,3 +14,7 @@ const userController = container.get<IUserController>(TYPES.UserControllerToken)
 userRouter.route('/').post(requestValidator(CreateUserSchema), userController.create);
 
 userRouter.route('/:id').get(requestValidator(FindUserByIdSchema), userController.findById);
+
+userRouter
+  .route('/:id/watchlist')
+  .post(requestValidator(AddMovieToWatchListSchema), userController.addMovieToWatchList);

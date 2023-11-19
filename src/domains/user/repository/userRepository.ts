@@ -6,9 +6,15 @@ import { TYPES } from '../../../ioc/types/types';
 import { IErrorMapper } from '../../../errors/errorMapper';
 import { UserFactory } from './userFactory';
 
+export type WatchListInfo = {
+  userId: string;
+  movieId: string;
+};
+
 export interface IUserRepository {
   findById(id: string): Promise<IUserModel | undefined>;
   create(newUser: NewUser): Promise<IUserModel>;
+  addMovieToWatchList(watchListData: WatchListInfo): Promise<WatchListInfo>;
 }
 
 @injectable()
@@ -38,7 +44,21 @@ export class UserRepository implements IUserRepository {
         .executeTakeFirstOrThrow();
 
       return UserFactory.createUser(user);
-    } catch (err: any) {
+    } catch (err) {
+      throw this.errorMapper.mapRepositoryError(err);
+    }
+  }
+
+  async addMovieToWatchList(watchListData: WatchListInfo): Promise<WatchListInfo> {
+    try {
+      const watchList = await this.db
+        .insertInto('users_movies_watchList')
+        .values(watchListData)
+        .returningAll()
+        .executeTakeFirstOrThrow();
+
+      return watchList;
+    } catch (err) {
       throw this.errorMapper.mapRepositoryError(err);
     }
   }

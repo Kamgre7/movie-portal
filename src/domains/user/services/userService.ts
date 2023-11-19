@@ -1,7 +1,7 @@
 import { inject, injectable } from 'inversify';
 import { TYPES } from '../../../ioc/types/types';
 import { IPasswordManager } from '../../passwordManager/passwordManager';
-import { IUserRepository } from '../repository/userRepository';
+import { IUserRepository, WatchListInfo } from '../repository/userRepository';
 import { NewUser } from '../schemas/createUserValidationSchema';
 import { IUserModel } from '../models/userModel';
 import { NotFoundError } from '../../../errors/notFoundError';
@@ -9,6 +9,7 @@ import { NotFoundError } from '../../../errors/notFoundError';
 export interface IUserService {
   create(newUser: NewUser): Promise<IUserModel>;
   findById(id: string): Promise<IUserModel>;
+  addMovieToWatchList(watchListData: WatchListInfo): Promise<WatchListInfo>;
 }
 
 @injectable()
@@ -40,5 +41,9 @@ export class UserService implements IUserService {
     }
 
     return user;
+  }
+
+  async addMovieToWatchList(watchListData: WatchListInfo): Promise<WatchListInfo> {
+    return this.userRepository.addMovieToWatchList(watchListData);
   }
 }

@@ -5,10 +5,12 @@ import { IUserService } from '../services/userService';
 import { ParsedRequest } from '../../../apiTypes';
 import { CreateUserReq } from '../schemas/createUserValidationSchema';
 import { FindUserByIdReq } from '../schemas/findUserByIdValidationSchema';
+import { AddMovieToWatchListReq } from '../schemas/addMovieToWatchListValidationSchema';
 
 export interface IUserController {
   findById(req: ParsedRequest<FindUserByIdReq>, res: Response): Promise<void>;
   create(req: ParsedRequest<CreateUserReq>, res: Response): Promise<void>;
+  addMovieToWatchList(req: ParsedRequest<AddMovieToWatchListReq>, res: Response): Promise<void>;
 }
 
 @injectable()
@@ -31,6 +33,20 @@ export class UserController implements IUserController {
 
     res.status(201).json({
       user,
+    });
+  };
+
+  addMovieToWatchList = async (
+    req: ParsedRequest<AddMovieToWatchListReq>,
+    res: Response
+  ): Promise<void> => {
+    const { id: userId } = req.params;
+    const { movieId } = req.body;
+
+    const watchListInfo = await this.userService.addMovieToWatchList({ movieId, userId });
+
+    res.status(201).json({
+      watchListInfo,
     });
   };
 }
