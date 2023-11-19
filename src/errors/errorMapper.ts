@@ -19,6 +19,10 @@ export class ErrorMapper implements IErrorMapper {
       return new BadRequestError(err.detail);
     }
 
+    if (err.code === DbErrorCodes.FOREIGN_KEY_VIOLATION) {
+      return new BadRequestError(err.detail);
+    }
+
     return new DbError(err.detail);
   }
 }
