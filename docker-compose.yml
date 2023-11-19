@@ -1,0 +1,32 @@
+version: '3.8'
+services:
+  node:
+    container_name: movie-portal-app
+    build:
+      context: .
+      target: build
+    volumes:
+      - .:/home
+      - /home/node_modules
+    ports:
+      - ${PORT}:${PORT}
+    env_file: ./.env.docker
+    command: npm run start:migrate:prod
+    networks:
+      - local
+    depends_on:
+      - db
+
+  db:
+    extends:
+      file: docker-compose.db.yml
+      service: db
+    networks:
+      - local
+
+networks:
+  local:
+    driver: bridge
+
+volumes:
+  postgres-data:

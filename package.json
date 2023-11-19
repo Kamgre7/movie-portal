@@ -10,7 +10,8 @@
     "dbInit": "ts-node -r dotenv/config ./src/database/scripts/databaseInit.ts",
     "build": "tsc",
     "test": "jest ",
-    "start:prod": "tsc && node dist/index"
+    "start:prod": "tsc && node dist/index",
+    "start:migrate:prod": "npm run dbInit && npm run migrations && npm run start:prod"
   },
   "keywords": [],
   "author": "",
