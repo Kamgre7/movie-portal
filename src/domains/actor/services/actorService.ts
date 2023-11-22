@@ -2,7 +2,7 @@ import { inject, injectable } from 'inversify';
 import { TYPES } from '../../../ioc/types/types';
 import { NotFoundError } from '../../../errors/notFoundError';
 import { NewActor } from '../schemas/createActorValidationSchema';
-import { IActorModel } from '../models/actorModel';
+import { IActorModel } from '../models/actor';
 import { IActorRepository } from '../repository/actorRepository';
 import { ActorCriteria } from '../schemas/findActorValidationSchema';
 
@@ -34,12 +34,6 @@ export class ActorService implements IActorService {
   }
 
   async findByCriteria(criteria: ActorCriteria): Promise<IActorModel[]> {
-    const actors = await this.actorRepository.findByCriteria(criteria);
-
-    if (!actors) {
-      throw new NotFoundError('Actors not found');
-    }
-
-    return actors;
+    return this.actorRepository.findByCriteria(criteria);
   }
 }
