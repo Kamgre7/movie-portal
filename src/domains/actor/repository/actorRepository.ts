@@ -1,15 +1,14 @@
 import { inject, injectable } from 'inversify';
-import { IActorModel } from '../models/actorModel';
+import { Actor, IActorModel } from '../models/actor';
 import { NewActor } from '../schemas/createActorValidationSchema';
 import { database } from '../../../database/database';
 import { TYPES } from '../../../ioc/types/types';
 import { IErrorMapper } from '../../../errors/errorMapper';
-import { ActorFactory } from './actorFactory';
 import { ActorCriteria } from '../schemas/findActorValidationSchema';
 
 export interface IActorRepository {
   findById(id: string): Promise<IActorModel | undefined>;
-  findByCriteria(criteria: ActorCriteria): Promise<IActorModel[] | undefined>;
+  findByCriteria(criteria: ActorCriteria): Promise<IActorModel[]>;
   create(newActor: NewActor): Promise<IActorModel>;
 }
 
@@ -28,10 +27,10 @@ export class ActorRepository implements IActorRepository {
       .selectAll()
       .executeTakeFirst();
 
-    return actor ? ActorFactory.createActor(actor) : undefined;
+    return actor ? Actor.createFromDB(actor) : undefined;
   }
 
-  async findByCriteria(criteria: ActorCriteria): Promise<IActorModel[] | undefined> {
+  async findByCriteria(criteria: ActorCriteria): Promise<IActorModel[]> {
     const { firstName, lastName } = criteria;
 
     let query = this.db.selectFrom('actors');
@@ -41,7 +40,7 @@ export class ActorRepository implements IActorRepository {
 
     const actors = await query.selectAll().execute();
 
-    return actors.length ? actors.map((actor) => ActorFactory.createActor(actor)) : undefined;
+    return actors.map((actor) => Actor.createFromDB(actor));
   }
 
   async create(newActor: NewActor): Promise<IActorModel> {
@@ -52,7 +51,7 @@ export class ActorRepository implements IActorRepository {
         .returningAll()
         .executeTakeFirstOrThrow();
 
-      return ActorFactory.createActor(actor);
+      return Actor.createFromDB(actor);
     } catch (err) {
       throw this.errorMapper.mapRepositoryError(err);
     }
