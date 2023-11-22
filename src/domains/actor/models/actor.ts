@@ -19,7 +19,7 @@ export class Actor implements IActorModel {
   updatedAt: Date;
   deletedAt: Date | null;
 
-  constructor(actorInfo: IActorModel) {
+  private constructor(actorInfo: IActorModel) {
     this.id = actorInfo.id;
     this.firstName = actorInfo.firstName;
     this.lastName = actorInfo.lastName;
@@ -27,5 +27,9 @@ export class Actor implements IActorModel {
     this.createdAt = actorInfo.createdAt;
     this.updatedAt = actorInfo.updatedAt;
     this.deletedAt = actorInfo.deletedAt;
+  }
+
+  static createFromDB(actorInfo: IActorModel): Actor {
+    return new Actor(actorInfo);
   }
 }
