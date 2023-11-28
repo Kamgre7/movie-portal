@@ -3,37 +3,82 @@ import { TYPES } from '../../../ioc/types/types';
 import { NotFoundError } from '../../../errors/notFoundError';
 import { NewActor } from '../schemas/createActorValidationSchema';
 import { IActorModel } from '../models/actor';
-import { IActorRepository } from '../repository/actorRepository';
 import { ActorCriteria } from '../schemas/findActorValidationSchema';
+import { ActorInMovieRating } from '../repository/actorRatingRepository';
+import { IActorDbAdapter } from '../adapters/actorDbAdapter';
+import { IActorRatingDbAdapter } from '../adapters/actorRatingDbAdapter';
+import { IActorRatingModel } from '../models/actorRating';
+import { BadRequestError } from '../../../errors/badRequestError';
 
 export interface IActorService {
   create(newActor: NewActor): Promise<IActorModel>;
-  findById(id: string): Promise<IActorModel>;
-  findByCriteria(criteria: ActorCriteria): Promise<IActorModel[]>;
+  findById(id: string, withRating: boolean): Promise<IActorModel>;
+  findByCriteria(criteria: ActorCriteria, withRating: boolean): Promise<IActorModel[]>;
+
+  rate(rateInfo: ActorInMovieRating): Promise<IActorRatingModel>;
+  updateRate(rateInfo: ActorInMovieRating): Promise<IActorRatingModel>;
 }
 
 @injectable()
 export class ActorService implements IActorService {
   constructor(
-    @inject(TYPES.ActorRepositoryToken)
-    private readonly actorRepository: IActorRepository
+    @inject(TYPES.ActorDbAdapterToken)
+    private readonly actorDbAdapter: IActorDbAdapter,
+    @inject(TYPES.ActorRatingDbAdapterToken)
+    private readonly actorRatingDbAdapter: IActorRatingDbAdapter
   ) {}
 
   async create(newActor: NewActor): Promise<IActorModel> {
-    return this.actorRepository.create(newActor);
+    const existingActor = await this.findByCriteria(
+      {
+        firstName: newActor.firstName,
+        lastName: newActor.lastName,
+      },
+      false
+    );
+
+    if (existingActor.length) {
+      throw new BadRequestError('Actor already exists');
+    }
+
+    const actor = await this.actorDbAdapter.create(newActor);
+
+    return actor;
   }
 
-  async findById(id: string): Promise<IActorModel> {
-    const actor = await this.actorRepository.findById(id);
+  async findById(id: string, withRating: boolean): Promise<IActorModel> {
+    const actor = await this.actorDbAdapter.findById(id);
 
     if (!actor) {
       throw new NotFoundError('Actor not found');
     }
 
+    if (withRating) {
+      actor.rating = await this.actorRatingDbAdapter.find(id);
+    }
+
     return actor;
   }
 
-  async findByCriteria(criteria: ActorCriteria): Promise<IActorModel[]> {
-    return this.actorRepository.findByCriteria(criteria);
+  async findByCriteria(criteria: ActorCriteria, withRating: boolean): Promise<IActorModel[]> {
+    const actors = await this.actorDbAdapter.findByCriteria(criteria);
+
+    if (withRating) {
+      const actorsRating = await Promise.all(
+        actors.map((actor) => this.actorRatingDbAdapter.find(actor.id))
+      );
+
+      actors.map((actor, index) => (actor.rating = actorsRating[index]));
+    }
+
+    return actors;
+  }
+
+  async rate(rateInfo: ActorInMovieRating): Promise<IActorRatingModel> {
+    return this.actorRatingDbAdapter.rate(rateInfo);
+  }
+
+  async updateRate(rateInfo: ActorInMovieRating): Promise<IActorRatingModel> {
+    return this.actorRatingDbAdapter.update(rateInfo);
   }
 }

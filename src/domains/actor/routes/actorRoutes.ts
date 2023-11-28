@@ -5,6 +5,7 @@ import { TYPES } from '../../../ioc/types/types';
 import { requestValidator } from '../../../middlewares/requestValidator';
 import { CreateActorSchema } from '../schemas/createActorValidationSchema';
 import { FindActorByCriteria, FindActorByIdSchema } from '../schemas/findActorValidationSchema';
+import { RateActorSchema } from '../schemas/rateActorValidationSchema';
 
 export const actorRouter = Router();
 
@@ -15,5 +16,10 @@ actorRouter.route('/').post(requestValidator(CreateActorSchema), actorController
 actorRouter
   .route('/search')
   .get(requestValidator(FindActorByCriteria), actorController.findByCriteria);
+
+actorRouter
+  .route('/:actorId/rate/movies/:movieId')
+  .post(requestValidator(RateActorSchema), actorController.rate)
+  .patch(requestValidator(RateActorSchema), actorController.updateRate);
 
 actorRouter.route('/:id').get(requestValidator(FindActorByIdSchema), actorController.findById);

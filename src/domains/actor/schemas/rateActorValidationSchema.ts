@@ -2,8 +2,8 @@ import { z } from 'zod';
 
 export const RateActorSchema = z.object({
   params: z.object({
-    movieId: z.string().uuid(),
     actorId: z.string().uuid(),
+    movieId: z.string().uuid(),
   }),
   body: z.object({
     userId: z.string().uuid(),

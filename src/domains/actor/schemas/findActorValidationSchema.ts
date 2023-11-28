@@ -6,6 +6,9 @@ export const FindActorByIdParamSchema = z.object({
 
 export const FindActorByIdSchema = z.object({
   params: FindActorByIdParamSchema,
+  query: z.object({
+    withRating: z.string().optional(),
+  }),
 });
 
 export type FindActorByIdReq = z.infer<typeof FindActorByIdSchema>;
@@ -13,6 +16,7 @@ export type FindActorByIdReq = z.infer<typeof FindActorByIdSchema>;
 export const FindActorByCriteriaQuery = z.object({
   firstName: z.string().trim().min(1).optional(),
   lastName: z.string().trim().min(1).optional(),
+  withRating: z.string().optional(),
 });
 
 export const FindActorByCriteria = z.object({
@@ -20,4 +24,4 @@ export const FindActorByCriteria = z.object({
 });
 
 export type FindActorByCriteriaReq = z.infer<typeof FindActorByCriteria>;
-export type ActorCriteria = z.infer<typeof FindActorByCriteriaQuery>;
+export type ActorCriteria = Omit<z.infer<typeof FindActorByCriteriaQuery>, 'withRating'>;
