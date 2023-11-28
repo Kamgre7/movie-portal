@@ -1,4 +1,6 @@
 import { GenderType } from '../../user/types/genderType';
+import { ActorFromDB } from '../repository/actorRepository';
+import { IActorRatingModel } from './actorRating';
 
 export interface IActorModel {
   id: string;
@@ -8,6 +10,7 @@ export interface IActorModel {
   createdAt: Date;
   updatedAt: Date;
   deletedAt: Date | null;
+  rating?: IActorRatingModel[];
 }
 
 export class Actor implements IActorModel {
@@ -18,8 +21,9 @@ export class Actor implements IActorModel {
   createdAt: Date;
   updatedAt: Date;
   deletedAt: Date | null;
+  rating?: IActorRatingModel[];
 
-  private constructor(actorInfo: IActorModel) {
+  private constructor(actorInfo: ActorFromDB, rating?: IActorRatingModel[]) {
     this.id = actorInfo.id;
     this.firstName = actorInfo.firstName;
     this.lastName = actorInfo.lastName;
@@ -27,9 +31,13 @@ export class Actor implements IActorModel {
     this.createdAt = actorInfo.createdAt;
     this.updatedAt = actorInfo.updatedAt;
     this.deletedAt = actorInfo.deletedAt;
+
+    if (rating) {
+      this.rating = rating;
+    }
   }
 
-  static createFromDB(actorInfo: IActorModel): Actor {
+  static createFromDB(actorInfo: ActorFromDB): IActorModel {
     return new Actor(actorInfo);
   }
 }
