@@ -13,5 +13,11 @@ export const TYPES = {
   ActorServiceToken: Symbol.for('IActorService'),
   ActorControllerToken: Symbol.for('IActorController'),
 
+  ActorRatingRepositoryToken: Symbol.for('IActorRatingRepository'),
+  ActorDbAdapterToken: Symbol.for('IActorDbAdapter'),
+  ActorRatingDbAdapterToken: Symbol.for('IActorRatingDbAdapter'),
+
+  ActorMoviesRepositoryToken: Symbol.for('IActorsMoviesRepository'),
+
   ErrorMapperToken: Symbol.for('IErrorMapper'),
 };
