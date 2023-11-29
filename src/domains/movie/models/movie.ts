@@ -7,7 +7,9 @@ export interface IMovieModel {
   releaseDate: Date;
   createdAt: Date;
   updatedAt: Date;
-  deletedAt: Date;
+  deletedAt: Date | null;
+  //actors?: ;
+  //rating?: ;
 }
 
 export class Movie implements IMovieModel {
@@ -17,9 +19,11 @@ export class Movie implements IMovieModel {
   releaseDate: Date;
   createdAt: Date;
   updatedAt: Date;
-  deletedAt: Date;
+  deletedAt: Date | null;
+  // actors?: ActorInfo[];
+  //rating?: MovieRatingInfo[];
 
-  constructor(movieInfo: IMovieModel) {
+  private constructor(movieInfo: IMovieModel) {
     this.id = movieInfo.id;
     this.title = movieInfo.title;
     this.category = movieInfo.category;
@@ -27,5 +31,9 @@ export class Movie implements IMovieModel {
     this.createdAt = movieInfo.createdAt;
     this.updatedAt = movieInfo.updatedAt;
     this.deletedAt = movieInfo.deletedAt;
+  }
+
+  static createFromDB(movieInfo: IMovieModel): IMovieModel {
+    return new Movie(movieInfo);
   }
 }
