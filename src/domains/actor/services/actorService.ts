@@ -9,6 +9,7 @@ import { IActorDbAdapter } from '../adapters/actorDbAdapter';
 import { IActorRatingDbAdapter } from '../adapters/actorRatingDbAdapter';
 import { IActorRatingModel } from '../models/actorRating';
 import { BadRequestError } from '../../../errors/badRequestError';
+import { IActorsMoviesRepository } from '../repository/actorMovieRepository';
 
 export interface IActorService {
   create(newActor: NewActor): Promise<IActorModel>;
@@ -25,7 +26,9 @@ export class ActorService implements IActorService {
     @inject(TYPES.ActorDbAdapterToken)
     private readonly actorDbAdapter: IActorDbAdapter,
     @inject(TYPES.ActorRatingDbAdapterToken)
-    private readonly actorRatingDbAdapter: IActorRatingDbAdapter
+    private readonly actorRatingDbAdapter: IActorRatingDbAdapter,
+    @inject(TYPES.ActorMoviesRepositoryToken)
+    private readonly actorMoviesRepository: IActorsMoviesRepository
   ) {}
 
   async create(newActor: NewActor): Promise<IActorModel> {
@@ -75,7 +78,16 @@ export class ActorService implements IActorService {
   }
 
   async rate(rateInfo: ActorInMovieRating): Promise<IActorRatingModel> {
-    return this.actorRatingDbAdapter.rate(rateInfo);
+    const actorInMovieExist = await this.actorMoviesRepository.find(
+      rateInfo.actorId,
+      rateInfo.movieId
+    );
+
+    if (!actorInMovieExist) {
+      throw new BadRequestError('Actor in movie not found');
+    }
+
+    return await this.actorRatingDbAdapter.rate(rateInfo);
   }
 
   async updateRate(rateInfo: ActorInMovieRating): Promise<IActorRatingModel> {

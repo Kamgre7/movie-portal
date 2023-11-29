@@ -2,8 +2,6 @@ import { inject, injectable } from 'inversify';
 import { database } from '../../../database/database';
 import { TYPES } from '../../../ioc/types/types';
 import { IErrorMapper } from '../../../errors/errorMapper';
-import { NoResultError } from 'kysely';
-import { BadRequestError } from '../../../errors/badRequestError';
 
 export type ActorInMovie = {
   movieId: string;
@@ -11,7 +9,7 @@ export type ActorInMovie = {
 };
 
 export interface IActorsMoviesRepository {
-  find(actorId: string, movieId: string): Promise<ActorInMovie>;
+  find(actorId: string, movieId: string): Promise<ActorInMovie | null>;
 }
 
 @injectable()
@@ -24,20 +22,17 @@ export class ActorsMoviesRepository implements IActorsMoviesRepository {
     private readonly db = database
   ) {}
 
-  async find(actorId: string, movieId: string): Promise<ActorInMovie> {
+  async find(actorId: string, movieId: string): Promise<ActorInMovie | null> {
     try {
       const actorInMovie = await this.db
         .selectFrom(this.actorsMoviesTable)
         .where('actorId', '=', actorId)
         .where('movieId', '=', movieId)
         .selectAll()
-        .executeTakeFirstOrThrow();
+        .executeTakeFirst();
 
-      return actorInMovie;
+      return actorInMovie ?? null;
     } catch (err) {
-      if (err instanceof NoResultError) {
-        throw new BadRequestError('Actor not found in movie');
-      }
       throw this.errorMapper.mapRepositoryError(err);
     }
   }
