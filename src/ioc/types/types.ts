@@ -9,6 +9,10 @@ export const TYPES = {
   MovieServiceToken: Symbol.for('IMovieService'),
   MovieControllerToken: Symbol.for('IMovieController'),
 
+  MovieDbAdapterToken: Symbol.for('IMovieDbAdapter'),
+  MovieRatingRepositoryToken: Symbol.for('IMovieRatingRepository'),
+  MovieRatingDbAdapterToken: Symbol.for('IMovieRatingDbAdapter'),
+
   ActorRepositoryToken: Symbol.for('IActorRepository'),
   ActorServiceToken: Symbol.for('IActorService'),
   ActorControllerToken: Symbol.for('IActorController'),

@@ -24,6 +24,15 @@ import {
   ActorsMoviesRepository,
   IActorsMoviesRepository,
 } from '../domains/actor/repository/actorMovieRepository';
+import { IMovieDbAdapter, MovieDbAdapter } from '../domains/movie/adapters/movieDbAdapter';
+import {
+  IMovieRatingRepository,
+  MovieRatingRepository,
+} from '../domains/movie/repository/movieRatingRepository';
+import {
+  IMovieRatingDbAdapter,
+  MovieRatingDbAdapter,
+} from '../domains/movie/adapters/movieRatingDbAdapter';
 
 export const container = new Container();
 
@@ -39,6 +48,11 @@ container.bind<IUserController>(TYPES.UserControllerToken).to(UserController);
 container.bind<IMovieRepository>(TYPES.MovieRepositoryToken).to(MovieRepository);
 container.bind<IMovieService>(TYPES.MovieServiceToken).to(MovieService);
 container.bind<IMovieController>(TYPES.MovieControllerToken).to(MovieController);
+container.bind<IMovieDbAdapter>(TYPES.MovieDbAdapterToken).to(MovieDbAdapter);
+
+//movies_rating
+container.bind<IMovieRatingRepository>(TYPES.MovieRatingRepositoryToken).to(MovieRatingRepository);
+container.bind<IMovieRatingDbAdapter>(TYPES.MovieRatingDbAdapterToken).to(MovieRatingDbAdapter);
 
 // actors
 container.bind<IActorRepository>(TYPES.ActorRepositoryToken).to(ActorRepository);
