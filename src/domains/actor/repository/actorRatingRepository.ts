@@ -51,9 +51,9 @@ export class ActorRatingRepository implements IActorRatingRepository {
   }
 
   async update(actorRateInfo: ActorInMovieRating): Promise<ActorInMovieRating> {
-    try {
-      const { actorId, movieId, rating, userId } = actorRateInfo;
+    const { actorId, movieId, rating, userId } = actorRateInfo;
 
+    try {
       const updatedRating = await this.db
         .updateTable(this.actorsRatingTable)
         .set({ rating })
