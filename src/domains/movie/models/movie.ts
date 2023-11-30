@@ -1,4 +1,13 @@
 import { CategoryType } from '../types/categoryType';
+import { IMovieRatingModel } from './movieRating';
+
+export type MovieExtension = {
+  actors?: ActorInMovieData[];
+  rating?: IMovieRatingModel[];
+};
+
+export type ActorInMovieData = { actorId: string };
+export type MovieConstructor = Omit<IMovieModel, 'actors' | 'rating'>;
 
 export interface IMovieModel {
   id: string;
@@ -8,8 +17,8 @@ export interface IMovieModel {
   createdAt: Date;
   updatedAt: Date;
   deletedAt: Date | null;
-  //actors?: ;
-  //rating?: ;
+  actors: ActorInMovieData[];
+  rating: IMovieRatingModel[];
 }
 
 export class Movie implements IMovieModel {
@@ -20,10 +29,10 @@ export class Movie implements IMovieModel {
   createdAt: Date;
   updatedAt: Date;
   deletedAt: Date | null;
-  // actors?: ActorInfo[];
-  //rating?: MovieRatingInfo[];
+  actors: ActorInMovieData[] = [];
+  rating: IMovieRatingModel[] = [];
 
-  private constructor(movieInfo: IMovieModel) {
+  private constructor(movieInfo: MovieConstructor, extended?: MovieExtension) {
     this.id = movieInfo.id;
     this.title = movieInfo.title;
     this.category = movieInfo.category;
@@ -31,9 +40,21 @@ export class Movie implements IMovieModel {
     this.createdAt = movieInfo.createdAt;
     this.updatedAt = movieInfo.updatedAt;
     this.deletedAt = movieInfo.deletedAt;
+
+    if (extended?.rating) {
+      this.rating = extended.rating;
+    }
+
+    if (extended?.actors) {
+      this.actors = extended.actors;
+    }
   }
 
-  static createFromDB(movieInfo: IMovieModel): IMovieModel {
+  static createExtended(movieInfo: MovieConstructor, extended: MovieExtension): IMovieModel {
+    return new Movie(movieInfo, extended);
+  }
+
+  static createFromDB(movieInfo: MovieConstructor): IMovieModel {
     return new Movie(movieInfo);
   }
 }

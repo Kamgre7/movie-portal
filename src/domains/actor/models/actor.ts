@@ -38,7 +38,7 @@ export class Actor implements IActorModel {
     }
   }
 
-  static createWithRating(actorInfo: ActorConstructor, rating: IActorRatingModel[]) {
+  static createWithRating(actorInfo: ActorConstructor, rating: IActorRatingModel[]): IActorModel {
     return new Actor(actorInfo, rating);
   }
 
