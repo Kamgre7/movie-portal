@@ -60,7 +60,7 @@ export class ActorRepository implements IActorRepository {
         actors.map((actor) => this.actorRatingRepository.find(actor.id))
       );
 
-      return actorsRating.map((actor, index) => Actor.createWithRating(actor, actorsRating[index]));
+      return actors.map((actor, index) => Actor.createWithRating(actor, actorsRating[index]));
     }
 
     return actors;

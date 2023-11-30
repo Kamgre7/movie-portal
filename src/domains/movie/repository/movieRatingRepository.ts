@@ -2,6 +2,7 @@ import { inject, injectable } from 'inversify';
 import { TYPES } from '../../../ioc/types/types';
 import { IErrorMapper } from '../../../errors/errorMapper';
 import { database } from '../../../database/database';
+import { IMovieRatingModel, MovieRating } from '../models/movieRating';
 
 export type MovieRatingData = {
   userId: string;
@@ -10,9 +11,9 @@ export type MovieRatingData = {
 };
 
 export interface IMovieRatingRepository {
-  rate(movieRating: MovieRatingData): Promise<MovieRatingData>;
-  update(movieRating: MovieRatingData): Promise<MovieRatingData>;
-  find(movieId: string): Promise<MovieRatingData[]>;
+  rate(movieRating: MovieRatingData): Promise<IMovieRatingModel>;
+  update(movieRating: MovieRatingData): Promise<IMovieRatingModel>;
+  find(movieId: string): Promise<IMovieRatingModel[]>;
 }
 
 @injectable()
@@ -25,7 +26,7 @@ export class MovieRatingRepository implements IMovieRatingRepository {
     private readonly db = database
   ) {}
 
-  async rate(movieRating: MovieRatingData): Promise<MovieRatingData> {
+  async rate(movieRating: MovieRatingData): Promise<IMovieRatingModel> {
     try {
       const rate = await this.db
         .insertInto(this.movieRatingTable)
@@ -33,23 +34,23 @@ export class MovieRatingRepository implements IMovieRatingRepository {
         .returningAll()
         .executeTakeFirstOrThrow();
 
-      return rate;
+      return MovieRating.createFromDB(rate);
     } catch (err) {
       throw this.errorMapper.mapRepositoryError(err);
     }
   }
 
-  async find(movieId: string): Promise<MovieRatingData[]> {
+  async find(movieId: string): Promise<IMovieRatingModel[]> {
     const ratings = await this.db
       .selectFrom(this.movieRatingTable)
       .where('movieId', '=', movieId)
       .selectAll()
       .execute();
 
-    return ratings;
+    return ratings.map((rating) => MovieRating.createFromDB(rating));
   }
 
-  async update(movieRating: MovieRatingData): Promise<MovieRatingData> {
+  async update(movieRating: MovieRatingData): Promise<IMovieRatingModel> {
     const { movieId, rating, userId } = movieRating;
 
     try {
@@ -61,7 +62,7 @@ export class MovieRatingRepository implements IMovieRatingRepository {
         .returningAll()
         .executeTakeFirstOrThrow();
 
-      return updatedRating;
+      return MovieRating.createFromDB(updatedRating);
     } catch (err) {
       throw this.errorMapper.mapRepositoryError(err);
     }
