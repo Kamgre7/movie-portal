@@ -24,7 +24,7 @@ export class ActorController implements IActorController {
   ) {}
 
   findById = async (req: ParsedRequest<FindActorByIdReq>, res: Response): Promise<void> => {
-    const withRating = req.query.withRating === 'true' ? true : false;
+    const withRating = req.query.withRating === 'true';
 
     const actor = await this.actorService.findById(req.params.id, withRating);
 
@@ -39,11 +39,9 @@ export class ActorController implements IActorController {
   ): Promise<void> => {
     const { withRating, firstName, lastName } = req.query;
 
-    const withRatingBoolean = withRating === 'true' ? true : false;
-
     const actors = await this.actorService.findByCriteria(
       { firstName, lastName },
-      withRatingBoolean
+      withRating === 'true'
     );
 
     res.status(200).json({
