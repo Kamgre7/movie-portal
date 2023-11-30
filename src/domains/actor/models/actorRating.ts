@@ -1,5 +1,7 @@
 import { ActorInMovieRating } from '../repository/actorRatingRepository';
 
+export type ActorRatingConstructor = Omit<ActorInMovieRating, 'actorId'>;
+
 export interface IActorRatingModel {
   userId: string;
   movieId: string;
@@ -11,13 +13,13 @@ export class ActorRating implements IActorRatingModel {
   movieId: string;
   rating: number;
 
-  private constructor(ratingInfo: ActorInMovieRating) {
+  private constructor(ratingInfo: ActorRatingConstructor) {
     this.rating = ratingInfo.rating;
     this.userId = ratingInfo.userId;
     this.movieId = ratingInfo.movieId;
   }
 
-  static createFromDB(actorInfo: ActorInMovieRating): IActorRatingModel {
-    return new ActorRating(actorInfo);
+  static createFromDB(ratingInfo: ActorRatingConstructor): IActorRatingModel {
+    return new ActorRating(ratingInfo);
   }
 }
