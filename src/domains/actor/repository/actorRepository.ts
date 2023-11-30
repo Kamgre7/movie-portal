@@ -4,22 +4,13 @@ import { database } from '../../../database/database';
 import { TYPES } from '../../../ioc/types/types';
 import { IErrorMapper } from '../../../errors/errorMapper';
 import { ActorCriteria } from '../schemas/findActorValidationSchema';
-import { GenderType } from '../../user/types/genderType';
-
-export type ActorFromDB = {
-  id: string;
-  firstName: string;
-  lastName: string;
-  gender: GenderType;
-  createdAt: Date;
-  updatedAt: Date;
-  deletedAt: Date | null;
-};
+import { Actor, IActorModel } from '../models/actor';
+import { IActorRatingRepository } from './actorRatingRepository';
 
 export interface IActorRepository {
-  findById(id: string): Promise<ActorFromDB | null>;
-  findByCriteria(criteria: ActorCriteria): Promise<ActorFromDB[]>;
-  create(newActor: NewActor): Promise<ActorFromDB>;
+  findById(id: string, withRating: boolean): Promise<IActorModel | null>;
+  findByCriteria(criteria: ActorCriteria, withRating: boolean): Promise<IActorModel[]>;
+  create(newActor: NewActor): Promise<IActorModel>;
 }
 
 @injectable()
@@ -29,20 +20,32 @@ export class ActorRepository implements IActorRepository {
   constructor(
     @inject(TYPES.ErrorMapperToken)
     private readonly errorMapper: IErrorMapper,
+    @inject(TYPES.ActorRatingRepositoryToken)
+    private readonly actorRatingRepository: IActorRatingRepository,
     private readonly db = database
   ) {}
 
-  async findById(id: string): Promise<ActorFromDB | null> {
+  async findById(id: string, withRating: boolean): Promise<IActorModel | null> {
     const actor = await this.db
       .selectFrom(this.actorsTable)
       .where('id', '=', id)
       .selectAll()
       .executeTakeFirst();
 
-    return actor ?? null;
+    if (!actor) {
+      return null;
+    }
+
+    if (withRating) {
+      const rating = await this.actorRatingRepository.find(actor.id);
+
+      return Actor.createWithRating(actor, rating);
+    }
+
+    return Actor.createFromDB(actor);
   }
 
-  async findByCriteria(criteria: ActorCriteria): Promise<ActorFromDB[]> {
+  async findByCriteria(criteria: ActorCriteria, withRating: boolean): Promise<IActorModel[]> {
     const { firstName, lastName } = criteria;
 
     let query = this.db.selectFrom(this.actorsTable);
@@ -52,10 +55,18 @@ export class ActorRepository implements IActorRepository {
 
     const actors = await query.selectAll().execute();
 
+    if (withRating) {
+      const actorsRating = await Promise.all(
+        actors.map((actor) => this.actorRatingRepository.find(actor.id))
+      );
+
+      return actorsRating.map((actor, index) => Actor.createWithRating(actor, actorsRating[index]));
+    }
+
     return actors;
   }
 
-  async create(newActor: NewActor): Promise<ActorFromDB> {
+  async create(newActor: NewActor): Promise<IActorModel> {
     try {
       const actor = await this.db
         .insertInto(this.actorsTable)
@@ -63,7 +74,7 @@ export class ActorRepository implements IActorRepository {
         .returningAll()
         .executeTakeFirstOrThrow();
 
-      return actor;
+      return Actor.createFromDB(actor);
     } catch (err) {
       throw this.errorMapper.mapRepositoryError(err);
     }

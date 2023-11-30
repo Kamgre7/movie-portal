@@ -10,6 +10,9 @@ export type ActorInMovie = {
 
 export interface IActorsMoviesRepository {
   find(actorId: string, movieId: string): Promise<ActorInMovie | null>;
+  findAll(movieId: string): Promise<ActorInMovie[]>;
+  findByActors(actorIds: string[], movieId: string): Promise<ActorInMovie[]>;
+  addActor(actorId: string, movieId: string): Promise<ActorInMovie>;
 }
 
 @injectable()
@@ -23,15 +26,47 @@ export class ActorsMoviesRepository implements IActorsMoviesRepository {
   ) {}
 
   async find(actorId: string, movieId: string): Promise<ActorInMovie | null> {
-    try {
-      const actorInMovie = await this.db
-        .selectFrom(this.actorsMoviesTable)
-        .where('actorId', '=', actorId)
-        .where('movieId', '=', movieId)
-        .selectAll()
-        .executeTakeFirst();
+    const actorInMovie = await this.db
+      .selectFrom(this.actorsMoviesTable)
+      .where('actorId', '=', actorId)
+      .where('movieId', '=', movieId)
+      .selectAll()
+      .executeTakeFirst();
 
-      return actorInMovie ?? null;
+    return actorInMovie ?? null;
+  }
+
+  async findAll(movieId: string): Promise<ActorInMovie[]> {
+    const actorInMovie = await this.db
+      .selectFrom(this.actorsMoviesTable)
+      .where('movieId', '=', movieId)
+      .selectAll()
+      .execute();
+
+    return actorInMovie;
+  }
+
+  async findByActors(actorIds: string[], movieId: string): Promise<ActorInMovie[]> {
+    const movies = await this.db
+      .selectFrom(this.actorsMoviesTable)
+      .where('movieId', '=', movieId)
+      .where('actorId', 'in', actorIds)
+      .selectAll()
+      .distinctOn('actors_movies.movieId')
+      .execute();
+
+    return movies;
+  }
+
+  async addActor(actorId: string, movieId: string): Promise<ActorInMovie> {
+    try {
+      const rate = await this.db
+        .insertInto(this.actorsMoviesTable)
+        .values({ actorId, movieId })
+        .returningAll()
+        .executeTakeFirstOrThrow();
+
+      return rate;
     } catch (err) {
       throw this.errorMapper.mapRepositoryError(err);
     }

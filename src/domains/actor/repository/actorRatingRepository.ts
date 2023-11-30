@@ -2,6 +2,7 @@ import { inject, injectable } from 'inversify';
 import { TYPES } from '../../../ioc/types/types';
 import { IErrorMapper } from '../../../errors/errorMapper';
 import { database } from '../../../database/database';
+import { ActorRating, IActorRatingModel } from '../models/actorRating';
 
 export type ActorInMovieRating = {
   userId: string;
@@ -11,9 +12,9 @@ export type ActorInMovieRating = {
 };
 
 export interface IActorRatingRepository {
-  rate(actorRateInfo: ActorInMovieRating): Promise<ActorInMovieRating>;
-  find(actorId: string): Promise<ActorInMovieRating[]>;
-  update(actorRateInfo: ActorInMovieRating): Promise<ActorInMovieRating>;
+  rate(actorRateInfo: ActorInMovieRating): Promise<IActorRatingModel>;
+  find(actorId: string): Promise<IActorRatingModel[]>;
+  update(actorRateInfo: ActorInMovieRating): Promise<IActorRatingModel>;
 }
 
 @injectable()
@@ -26,7 +27,7 @@ export class ActorRatingRepository implements IActorRatingRepository {
     private readonly db = database
   ) {}
 
-  async rate(rateInfo: ActorInMovieRating): Promise<ActorInMovieRating> {
+  async rate(rateInfo: ActorInMovieRating): Promise<IActorRatingModel> {
     try {
       const rate = await this.db
         .insertInto(this.actorsRatingTable)
@@ -34,23 +35,23 @@ export class ActorRatingRepository implements IActorRatingRepository {
         .returningAll()
         .executeTakeFirstOrThrow();
 
-      return rate;
+      return ActorRating.createFromDB(rate);
     } catch (err) {
       throw this.errorMapper.mapRepositoryError(err);
     }
   }
 
-  async find(actorId: string): Promise<ActorInMovieRating[]> {
+  async find(actorId: string): Promise<IActorRatingModel[]> {
     const ratings = await this.db
       .selectFrom(this.actorsRatingTable)
       .where('actorId', '=', actorId)
       .selectAll()
       .execute();
 
-    return ratings;
+    return ratings.map((rating) => ActorRating.createFromDB(rating));
   }
 
-  async update(actorRateInfo: ActorInMovieRating): Promise<ActorInMovieRating> {
+  async update(actorRateInfo: ActorInMovieRating): Promise<IActorRatingModel> {
     const { actorId, movieId, rating, userId } = actorRateInfo;
 
     try {
@@ -63,7 +64,7 @@ export class ActorRatingRepository implements IActorRatingRepository {
         .returningAll()
         .executeTakeFirstOrThrow();
 
-      return updatedRating;
+      return ActorRating.createFromDB(updatedRating);
     } catch (err) {
       throw this.errorMapper.mapRepositoryError(err);
     }
