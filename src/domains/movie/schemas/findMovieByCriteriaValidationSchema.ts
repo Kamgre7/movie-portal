@@ -8,7 +8,8 @@ export const FindMovieByCriteriaQuery = z.object({
     .date()
     .refine((val) => val < new Date())
     .optional(),
-  actors: z.array(z.string().uuid()).default([]),
+  withRating: z.string().optional(),
+  withActors: z.string().optional(),
 });
 
 export const FindMovieByCriteriaSchema = z.object({
@@ -16,5 +17,13 @@ export const FindMovieByCriteriaSchema = z.object({
 });
 
 export type FindMovieByCriteriaReq = z.infer<typeof FindMovieByCriteriaSchema>;
-export type MovieCriteria = z.infer<typeof FindMovieByCriteriaQuery>;
-export type MovieCriteriaWithoutActors = Omit<MovieCriteria, 'actors'>;
+
+export type MovieCriteria = Omit<
+  z.infer<typeof FindMovieByCriteriaQuery>,
+  'withRating' | 'withActors'
+>;
+
+export type MovieExtensionCriteria = {
+  withRating: boolean;
+  withActors: boolean;
+};
