@@ -10,7 +10,10 @@ export interface IUserModel {
   createdAt: Date;
   updatedAt: Date;
   deletedAt: Date | null;
+  watchList?: { movieId: string }[];
 }
+
+export type UserConstructor = Omit<IUserModel, 'watchList'>;
 
 export class User implements IUserModel {
   id: string;
@@ -22,8 +25,9 @@ export class User implements IUserModel {
   createdAt: Date;
   updatedAt: Date;
   deletedAt: Date | null;
+  watchList?: { movieId: string }[];
 
-  constructor(userInfo: IUserModel) {
+  private constructor(userInfo: UserConstructor, watchList?: []) {
     this.id = userInfo.id;
     this.email = userInfo.email;
     this.firstName = userInfo.firstName;
@@ -33,5 +37,9 @@ export class User implements IUserModel {
     this.createdAt = userInfo.createdAt;
     this.updatedAt = userInfo.updatedAt;
     this.deletedAt = userInfo.deletedAt;
+  }
+
+  static createFromDB(userInfo: UserConstructor): IUserModel {
+    return new User(userInfo);
   }
 }
