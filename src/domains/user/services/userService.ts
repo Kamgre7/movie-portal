@@ -3,7 +3,7 @@ import { TYPES } from '../../../ioc/types/types';
 import { IPasswordManager } from '../../passwordManager/passwordManager';
 import { IUserRepository, WatchListInfo } from '../repository/userRepository';
 import { NewUser } from '../schemas/createUserValidationSchema';
-import { IUserModel } from '../models/userModel';
+import { IUserModel } from '../models/user';
 import { NotFoundError } from '../../../errors/notFoundError';
 
 export interface IUserService {

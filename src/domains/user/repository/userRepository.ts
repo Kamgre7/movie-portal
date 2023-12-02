@@ -1,10 +1,9 @@
 import { inject, injectable } from 'inversify';
 import { database } from '../../../database/database';
-import { IUserModel } from '../models/userModel';
+import { IUserModel, User } from '../models/user';
 import { NewUser } from '../schemas/createUserValidationSchema';
 import { TYPES } from '../../../ioc/types/types';
 import { IErrorMapper } from '../../../errors/errorMapper';
-import { UserFactory } from './userFactory';
 
 export type WatchListInfo = {
   userId: string;
@@ -12,27 +11,40 @@ export type WatchListInfo = {
 };
 
 export interface IUserRepository {
-  findById(id: string): Promise<IUserModel | undefined>;
+  findById(id: string): Promise<IUserModel | null>;
+  findByEmail(id: string): Promise<IUserModel | null>;
   create(newUser: NewUser): Promise<IUserModel>;
   addMovieToWatchList(watchListData: WatchListInfo): Promise<WatchListInfo>;
 }
 
 @injectable()
 export class UserRepository implements IUserRepository {
+  private readonly usersTable = 'users';
+
   constructor(
     @inject(TYPES.ErrorMapperToken)
     private readonly errorMapper: IErrorMapper,
     private readonly db = database
   ) {}
 
-  async findById(id: string): Promise<IUserModel | undefined> {
+  async findById(id: string): Promise<IUserModel | null> {
     const user = await this.db
-      .selectFrom('users')
+      .selectFrom(this.usersTable)
       .where('id', '=', id)
       .selectAll()
       .executeTakeFirst();
 
-    return user ? UserFactory.createUser(user) : undefined;
+    return user ? User.createFromDB(user) : null;
+  }
+
+  async findByEmail(email: string): Promise<IUserModel | null> {
+    const user = await this.db
+      .selectFrom(this.usersTable)
+      .where('email', '=', email)
+      .selectAll()
+      .executeTakeFirst();
+
+    return user ? User.createFromDB(user) : null;
   }
 
   async create(newUser: NewUser): Promise<IUserModel> {
@@ -43,7 +55,7 @@ export class UserRepository implements IUserRepository {
         .returningAll()
         .executeTakeFirstOrThrow();
 
-      return UserFactory.createUser(user);
+      return User.createFromDB(user);
     } catch (err) {
       throw this.errorMapper.mapRepositoryError(err);
     }
