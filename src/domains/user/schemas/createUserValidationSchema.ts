@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { GENDER } from '../types/genderType';
 
 // Minimum eight characters, at least one uppercase, one lowercase character, one number and one special character
-const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+export const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 
 export const CreateUserBodySchema = z.object({
   email: z.string().email(),
