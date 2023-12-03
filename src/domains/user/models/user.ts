@@ -1,3 +1,4 @@
+import { UserWatchList } from '../repository/watchilistRepository';
 import { GenderType } from '../types/genderType';
 
 export interface IUserModel {
@@ -10,7 +11,7 @@ export interface IUserModel {
   createdAt: Date;
   updatedAt: Date;
   deletedAt: Date | null;
-  watchList?: { movieId: string }[];
+  watchList?: UserWatchList[];
 }
 
 export type UserConstructor = Omit<IUserModel, 'watchList'>;
@@ -25,9 +26,9 @@ export class User implements IUserModel {
   createdAt: Date;
   updatedAt: Date;
   deletedAt: Date | null;
-  watchList?: { movieId: string }[];
+  watchList?: UserWatchList[];
 
-  private constructor(userInfo: UserConstructor, watchList?: []) {
+  private constructor(userInfo: UserConstructor, watchList?: UserWatchList[]) {
     this.id = userInfo.id;
     this.email = userInfo.email;
     this.firstName = userInfo.firstName;
@@ -37,9 +38,17 @@ export class User implements IUserModel {
     this.createdAt = userInfo.createdAt;
     this.updatedAt = userInfo.updatedAt;
     this.deletedAt = userInfo.deletedAt;
+
+    if (watchList) {
+      this.watchList = watchList;
+    }
   }
 
   static createFromDB(userInfo: UserConstructor): IUserModel {
     return new User(userInfo);
+  }
+
+  static createWithWatchList(userInfo: UserConstructor, watchList: UserWatchList[]): IUserModel {
+    return new User(userInfo, watchList);
   }
 }

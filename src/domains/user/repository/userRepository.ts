@@ -5,16 +5,10 @@ import { NewUser } from '../schemas/createUserValidationSchema';
 import { TYPES } from '../../../ioc/types/types';
 import { IErrorMapper } from '../../../errors/errorMapper';
 
-export type WatchListInfo = {
-  userId: string;
-  movieId: string;
-};
-
 export interface IUserRepository {
   findById(id: string): Promise<IUserModel | null>;
   findByEmail(id: string): Promise<IUserModel | null>;
   create(newUser: NewUser): Promise<IUserModel>;
-  addMovieToWatchList(watchListData: WatchListInfo): Promise<WatchListInfo>;
 }
 
 @injectable()
@@ -56,20 +50,6 @@ export class UserRepository implements IUserRepository {
         .executeTakeFirstOrThrow();
 
       return User.createFromDB(user);
-    } catch (err) {
-      throw this.errorMapper.mapRepositoryError(err);
-    }
-  }
-
-  async addMovieToWatchList(watchListData: WatchListInfo): Promise<WatchListInfo> {
-    try {
-      const watchList = await this.db
-        .insertInto('users_movies_watchList')
-        .values(watchListData)
-        .returningAll()
-        .executeTakeFirstOrThrow();
-
-      return watchList;
     } catch (err) {
       throw this.errorMapper.mapRepositoryError(err);
     }

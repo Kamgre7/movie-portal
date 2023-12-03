@@ -1,15 +1,21 @@
 import { inject, injectable } from 'inversify';
 import { TYPES } from '../../../ioc/types/types';
 import { IPasswordManager } from '../../passwordManager/passwordManager';
-import { IUserRepository, WatchListInfo } from '../repository/userRepository';
+import { IUserRepository } from '../repository/userRepository';
 import { NewUser } from '../schemas/createUserValidationSchema';
 import { IUserModel } from '../models/user';
 import { NotFoundError } from '../../../errors/notFoundError';
+import {
+  IWatchListRepository,
+  UserWatchList,
+  WatchListInfo,
+} from '../repository/watchilistRepository';
 
 export interface IUserService {
   create(newUser: NewUser): Promise<IUserModel>;
   findById(id: string): Promise<IUserModel>;
-  addMovieToWatchList(watchListData: WatchListInfo): Promise<WatchListInfo>;
+
+  addMovieToWatchList(watchListData: WatchListInfo): Promise<UserWatchList>;
 }
 
 @injectable()
@@ -18,7 +24,9 @@ export class UserService implements IUserService {
     @inject(TYPES.PasswordManagerToken)
     private readonly passwordManager: IPasswordManager,
     @inject(TYPES.UserRepositoryToken)
-    private readonly userRepository: IUserRepository
+    private readonly userRepository: IUserRepository,
+    @inject(TYPES.UserWatchListRepositoryToken)
+    private readonly watchListRepository: IWatchListRepository
   ) {}
 
   async create(newUser: NewUser): Promise<IUserModel> {
@@ -43,7 +51,7 @@ export class UserService implements IUserService {
     return user;
   }
 
-  async addMovieToWatchList(watchListData: WatchListInfo): Promise<WatchListInfo> {
-    return this.userRepository.addMovieToWatchList(watchListData);
+  async addMovieToWatchList(watchListData: WatchListInfo): Promise<UserWatchList> {
+    return this.watchListRepository.addMovie(watchListData);
   }
 }
