@@ -23,6 +23,17 @@ import {
   IMovieRatingRepository,
   MovieRatingRepository,
 } from '../domains/movie/repository/movieRatingRepository';
+import { AuthService, IAuthService } from '../domains/auth/services/authService';
+import { AuthController, IAuthController } from '../domains/auth/controllers/authController';
+import { IJwtManager, JwtManager } from '../domains/auth/jwt/jwtManager';
+import {
+  IWatchListRepository,
+  WatchListRepository,
+} from '../domains/user/repository/watchilistRepository';
+import {
+  IRefreshTokenRepository,
+  RefreshTokenRepository,
+} from '../domains/auth/repository/refreshTokenRepository';
 
 export const container = new Container();
 
@@ -33,6 +44,17 @@ container.bind<IPasswordManager>(TYPES.PasswordManagerToken).to(PasswordManager)
 container.bind<IUserService>(TYPES.UserServiceToken).to(UserService);
 container.bind<IUserRepository>(TYPES.UserRepositoryToken).to(UserRepository);
 container.bind<IUserController>(TYPES.UserControllerToken).to(UserController);
+
+// users_watchList
+container.bind<IWatchListRepository>(TYPES.UserWatchListRepositoryToken).to(WatchListRepository);
+
+//auth
+container.bind<IAuthService>(TYPES.AuthServiceToken).to(AuthService);
+container.bind<IAuthController>(TYPES.AuthControllerToken).to(AuthController);
+container.bind<IJwtManager>(TYPES.JwtManagerToken).to(JwtManager);
+container
+  .bind<IRefreshTokenRepository>(TYPES.RefreshTokenRepositoryToken)
+  .to(RefreshTokenRepository);
 
 // movies
 container.bind<IMovieRepository>(TYPES.MovieRepositoryToken).to(MovieRepository);
