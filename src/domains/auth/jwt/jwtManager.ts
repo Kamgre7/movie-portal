@@ -21,8 +21,8 @@ export interface IJwtManager {
 
 @injectable()
 export class JwtManager implements IJwtManager {
-  private readonly accessTokenExpiresIn = 60 * 60 * 24;
-  private readonly refreshTokenExpiresIn = this.accessTokenExpiresIn * 5;
+  private readonly accessTokenExpiresIn = jwtConfig.jwtTokenExpireInDays * 60 * 60 * 24;
+  private readonly refreshTokenExpiresIn = jwtConfig.jwtRefreshTokenExpireInDays * 60 * 60 * 24;
 
   constructor() {}
 
