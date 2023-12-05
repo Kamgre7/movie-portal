@@ -6,7 +6,6 @@ import { UnauthorizedError } from '../../../errors/unauthorizedError';
 export interface UserPayload {
   id: string;
   email: string;
-  role: string;
 }
 
 export type TokenPair = {
