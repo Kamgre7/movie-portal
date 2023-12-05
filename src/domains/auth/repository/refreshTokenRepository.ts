@@ -5,17 +5,20 @@ import { TYPES } from '../../../ioc/types/types';
 import { IErrorMapper } from '../../../errors/errorMapper';
 import { jwtConfig } from '../jwt/jwtConfig';
 
-export type TokenInfo = {
+export type StringOrNull = string | null;
+
+export type TokenInfo<T extends StringOrNull> = {
   userId: string;
-  token: string;
-  expireAt: Date;
-  createdAt: Date;
+  token: T;
+  expireAt: T extends string ? Date : null;
+  createdAt: T extends string ? Date : null;
 };
 
 export interface IRefreshTokenRepository {
-  create(userId: string, refreshToken: string): Promise<TokenInfo>;
-  update(refreshToken: string, userId: string): Promise<TokenInfo>;
-  find(userId: string): Promise<TokenInfo | null>;
+  create(userId: string, refreshToken: string): Promise<TokenInfo<string>>;
+  update(refreshToken: string, userId: string): Promise<TokenInfo<string>>;
+  find(refreshToken: string): Promise<TokenInfo<string> | null>;
+  softDelete(userId: string): Promise<TokenInfo<null>>;
 }
 
 @injectable()
@@ -28,17 +31,17 @@ export class RefreshTokenRepository implements IRefreshTokenRepository {
     private readonly db = database
   ) {}
 
-  async find(userId: string): Promise<TokenInfo | null> {
+  async find(refreshToken: string): Promise<TokenInfo<string> | null> {
     const token = await this.db
       .selectFrom(this.refreshTokenTable)
-      .where('userId', '=', userId)
+      .where('token', '=', refreshToken)
       .selectAll()
       .executeTakeFirst();
 
-    return token ?? null;
+    return token ? (token as TokenInfo<string>) : null;
   }
 
-  async create(userId: string, refreshToken: string): Promise<TokenInfo> {
+  async create(userId: string, refreshToken: string): Promise<TokenInfo<string>> {
     try {
       const token = await this.db
         .insertInto(this.refreshTokenTable)
@@ -51,13 +54,13 @@ export class RefreshTokenRepository implements IRefreshTokenRepository {
         .returningAll()
         .executeTakeFirstOrThrow();
 
-      return token;
+      return token as TokenInfo<string>;
     } catch (err) {
       throw this.errorMapper.mapRepositoryError(err);
     }
   }
 
-  async update(refreshToken: string, userId: string): Promise<TokenInfo> {
+  async update(refreshToken: string, userId: string): Promise<TokenInfo<string>> {
     try {
       const updatedToken = await this.db
         .updateTable(this.refreshTokenTable)
@@ -70,7 +73,26 @@ export class RefreshTokenRepository implements IRefreshTokenRepository {
         .returningAll()
         .executeTakeFirstOrThrow();
 
-      return updatedToken;
+      return updatedToken as TokenInfo<string>;
+    } catch (err) {
+      throw this.errorMapper.mapRepositoryError(err);
+    }
+  }
+
+  async softDelete(userId: string): Promise<TokenInfo<null>> {
+    try {
+      const updatedToken = await this.db
+        .updateTable(this.refreshTokenTable)
+        .set({
+          token: null,
+          createdAt: null,
+          expireAt: null,
+        })
+        .where('users_refresh_token.userId', '=', userId)
+        .returningAll()
+        .executeTakeFirstOrThrow();
+
+      return updatedToken as TokenInfo<null>;
     } catch (err) {
       throw this.errorMapper.mapRepositoryError(err);
     }
