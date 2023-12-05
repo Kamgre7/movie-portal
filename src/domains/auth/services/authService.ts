@@ -6,10 +6,12 @@ import { IUserRepository } from '../../user/repository/userRepository';
 import { IJwtManager, TokenPair } from '../jwt/jwtManager';
 import { UnauthorizedError } from '../../../errors/unauthorizedError';
 import { IRefreshTokenRepository } from '../repository/refreshTokenRepository';
+import { ForbiddenError } from '../../../errors/forbiddenError';
 
 export interface IAuthService {
   login(loginInfo: LoginData): Promise<TokenPair>;
-  refreshToken(refreshToken: string): Promise<void>;
+  refreshToken(refreshToken: string): Promise<string>;
+  logout(userId: string): Promise<void>;
 }
 
 @injectable()
@@ -43,7 +45,6 @@ export class AuthService implements IAuthService {
     const tokens = this.jwtManager.createToken({
       id: user.id,
       email: user.email,
-      role: 'USER',
     });
 
     await this.refreshTokenRepository.create(user.id, tokens.refreshToken);
@@ -51,10 +52,19 @@ export class AuthService implements IAuthService {
     return tokens;
   }
 
-  async refreshToken(refreshToken: string): Promise<void> {
-    // @TODO
-    // check if refresh token exist in db
-    // if not exist throw Error with code 403
-    //const newAccessToken = this.jwtManager.refreshToken(refreshToken);
+  async refreshToken(refreshToken: string): Promise<string> {
+    const token = await this.refreshTokenRepository.find(refreshToken);
+
+    if (!token) {
+      throw new ForbiddenError('Invalid refresh token');
+    }
+
+    const newAccessToken = this.jwtManager.refreshToken(refreshToken);
+
+    return newAccessToken;
+  }
+
+  async logout(userId: string): Promise<void> {
+    this.refreshTokenRepository.softDelete(userId);
   }
 }
