@@ -1,5 +1,5 @@
 import { injectable } from 'inversify';
-import { sign, verify } from 'jsonwebtoken';
+import { JwtPayload, sign, verify } from 'jsonwebtoken';
 import { jwtConfig } from './jwtConfig';
 import { UnauthorizedError } from '../../../errors/unauthorizedError';
 
@@ -43,10 +43,10 @@ export class JwtManager implements IJwtManager {
 
   refreshToken(refreshToken: string): string {
     try {
-      const payload = verify(refreshToken, jwtConfig.jwtRefreshTokenSecret) as UserPayload;
+      const payload = verify(refreshToken, jwtConfig.jwtRefreshTokenSecret) as JwtPayload;
 
       const newAccessToken = this.generateToken(
-        payload,
+        { email: payload.email, id: payload.id },
         jwtConfig.jwtTokenSecret,
         this.accessTokenExpiresIn
       );
