@@ -14,10 +14,15 @@ export type TokenInfo<T extends StringOrNull> = {
   createdAt: T extends string ? Date : null;
 };
 
+export type TokenCriteria = {
+  userId?: string;
+  refreshToken?: string;
+};
+
 export interface IRefreshTokenRepository {
-  create(userId: string, refreshToken: string): Promise<TokenInfo<string>>;
+  create(refreshToken: string, userId: string): Promise<TokenInfo<string>>;
   update(refreshToken: string, userId: string): Promise<TokenInfo<string>>;
-  find(refreshToken: string): Promise<TokenInfo<string> | null>;
+  find(criteria: TokenCriteria): Promise<TokenInfo<string> | null>;
   softDelete(userId: string): Promise<TokenInfo<null>>;
 }
 
@@ -31,17 +36,20 @@ export class RefreshTokenRepository implements IRefreshTokenRepository {
     private readonly db = database
   ) {}
 
-  async find(refreshToken: string): Promise<TokenInfo<string> | null> {
-    const token = await this.db
-      .selectFrom(this.refreshTokenTable)
-      .where('token', '=', refreshToken)
-      .selectAll()
-      .executeTakeFirst();
+  async find(criteria: TokenCriteria): Promise<TokenInfo<string> | null> {
+    const { refreshToken, userId } = criteria;
 
-    return token ? (token as TokenInfo<string>) : null;
+    let query = this.db.selectFrom(this.refreshTokenTable).selectAll();
+
+    if (refreshToken) query = query.where('token', '=', refreshToken);
+    if (userId) query = query.where('userId', '=', userId);
+
+    const foundToken = await query.executeTakeFirst();
+
+    return foundToken ? (foundToken as TokenInfo<string>) : null;
   }
 
-  async create(userId: string, refreshToken: string): Promise<TokenInfo<string>> {
+  async create(refreshToken: string, userId: string): Promise<TokenInfo<string>> {
     try {
       const token = await this.db
         .insertInto(this.refreshTokenTable)
