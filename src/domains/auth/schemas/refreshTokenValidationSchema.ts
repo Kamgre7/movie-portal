@@ -9,4 +9,3 @@ export const RefreshTokenSchema = z.object({
 });
 
 export type RefreshTokenReq = z.infer<typeof RefreshTokenSchema>;
-export type TokenData = z.infer<typeof RefreshTokenBodySchema>;
