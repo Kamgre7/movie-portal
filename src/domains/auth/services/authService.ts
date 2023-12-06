@@ -47,13 +47,13 @@ export class AuthService implements IAuthService {
       email: user.email,
     });
 
-    await this.refreshTokenRepository.create(user.id, tokens.refreshToken);
+    await this.createOrUpdateTokenInDb(tokens.refreshToken, user.id);
 
     return tokens;
   }
 
   async refreshToken(refreshToken: string): Promise<string> {
-    const token = await this.refreshTokenRepository.find(refreshToken);
+    const token = await this.refreshTokenRepository.find({ refreshToken });
 
     if (!token) {
       throw new ForbiddenError('Invalid refresh token');
@@ -66,5 +66,13 @@ export class AuthService implements IAuthService {
 
   async logout(userId: string): Promise<void> {
     this.refreshTokenRepository.softDelete(userId);
+  }
+
+  private async createOrUpdateTokenInDb(refreshToken: string, userId: string): Promise<void> {
+    const refreshTokenInDb = await this.refreshTokenRepository.find({ userId });
+
+    refreshTokenInDb
+      ? await this.refreshTokenRepository.update(refreshToken, userId)
+      : await this.refreshTokenRepository.create(refreshToken, userId);
   }
 }
