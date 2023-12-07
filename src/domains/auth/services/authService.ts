@@ -45,6 +45,7 @@ export class AuthService implements IAuthService {
     const tokens = this.jwtManager.createToken({
       id: user.id,
       email: user.email,
+      role: user.role,
     });
 
     await this.createOrUpdateTokenInDb(tokens.refreshToken, user.id);

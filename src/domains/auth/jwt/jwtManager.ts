@@ -2,10 +2,12 @@ import { injectable } from 'inversify';
 import { JwtPayload, sign, verify } from 'jsonwebtoken';
 import { jwtConfig } from './jwtConfig';
 import { UnauthorizedError } from '../../../errors/unauthorizedError';
+import { RoleType } from '../../user/types/userRole';
 
 export interface UserPayload {
   id: string;
   email: string;
+  role: RoleType;
 }
 
 export type TokenPair = {
@@ -46,7 +48,7 @@ export class JwtManager implements IJwtManager {
       const payload = verify(refreshToken, jwtConfig.jwtRefreshTokenSecret) as JwtPayload;
 
       const newAccessToken = this.generateToken(
-        { email: payload.email, id: payload.id },
+        { email: payload.email, id: payload.id, role: payload.role },
         jwtConfig.jwtTokenSecret,
         this.accessTokenExpiresIn
       );
