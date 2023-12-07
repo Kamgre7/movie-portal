@@ -1,5 +1,6 @@
 import { UserWatchList } from '../repository/watchilistRepository';
 import { GenderType } from '../types/genderType';
+import { RoleType } from '../types/userRole';
 
 export interface IUserModel {
   id: string;
@@ -8,6 +9,7 @@ export interface IUserModel {
   lastName: string;
   password: string;
   gender: GenderType;
+  role: RoleType;
   createdAt: Date;
   updatedAt: Date;
   deletedAt: Date | null;
@@ -23,6 +25,7 @@ export class User implements IUserModel {
   lastName: string;
   password: string;
   gender: GenderType;
+  role: RoleType;
   createdAt: Date;
   updatedAt: Date;
   deletedAt: Date | null;
@@ -35,6 +38,7 @@ export class User implements IUserModel {
     this.lastName = userInfo.lastName;
     this.password = userInfo.password;
     this.gender = userInfo.gender;
+    this.role = userInfo.role;
     this.createdAt = userInfo.createdAt;
     this.updatedAt = userInfo.updatedAt;
     this.deletedAt = userInfo.deletedAt;
