@@ -54,7 +54,7 @@ export class Movie implements IMovieModel {
     return new Movie(movieInfo, extended);
   }
 
-  static createFromDB(movieInfo: MovieConstructor): IMovieModel {
+  static createBasic(movieInfo: MovieConstructor): IMovieModel {
     return new Movie(movieInfo);
   }
 }

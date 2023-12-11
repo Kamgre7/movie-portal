@@ -34,7 +34,7 @@ export class MovieRatingRepository implements IMovieRatingRepository {
         .returningAll()
         .executeTakeFirstOrThrow();
 
-      return MovieRating.createFromDB(rate);
+      return MovieRating.createBasic(rate);
     } catch (err) {
       throw this.errorMapper.mapRepositoryError(err);
     }
@@ -47,7 +47,7 @@ export class MovieRatingRepository implements IMovieRatingRepository {
       .selectAll()
       .execute();
 
-    return ratings.map((rating) => MovieRating.createFromDB(rating));
+    return ratings.map((rating) => MovieRating.createBasic(rating));
   }
 
   async update(movieRating: MovieRatingData): Promise<IMovieRatingModel> {
@@ -62,7 +62,7 @@ export class MovieRatingRepository implements IMovieRatingRepository {
         .returningAll()
         .executeTakeFirstOrThrow();
 
-      return MovieRating.createFromDB(updatedRating);
+      return MovieRating.createBasic(updatedRating);
     } catch (err) {
       throw this.errorMapper.mapRepositoryError(err);
     }

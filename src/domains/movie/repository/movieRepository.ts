@@ -42,7 +42,7 @@ export class MovieRepository implements IMovieRepository {
         .returningAll()
         .executeTakeFirstOrThrow();
 
-      return Movie.createFromDB(movie);
+      return Movie.createBasic(movie);
     } catch (err) {
       throw this.errorMapper.mapRepositoryError(err);
     }
@@ -71,7 +71,7 @@ export class MovieRepository implements IMovieRepository {
       return Movie.createExtended(movie, { rating, actors });
     }
 
-    return Movie.createFromDB(movie);
+    return Movie.createBasic(movie);
   }
 
   async findByCriteria(
@@ -102,6 +102,6 @@ export class MovieRepository implements IMovieRepository {
       );
     }
 
-    return movies.map((movie) => Movie.createFromDB(movie));
+    return movies.map((movie) => Movie.createBasic(movie));
   }
 }

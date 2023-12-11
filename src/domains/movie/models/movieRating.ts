@@ -14,7 +14,7 @@ export class MovieRating implements IMovieRatingModel {
     this.userId = ratingInfo.userId;
   }
 
-  static createFromDB(movieRating: MovieRatingData): IMovieRatingModel {
+  static createBasic(movieRating: MovieRatingData): IMovieRatingModel {
     return new MovieRating(movieRating);
   }
 }
