@@ -19,7 +19,7 @@ export class ActorRating implements IActorRatingModel {
     this.movieId = ratingInfo.movieId;
   }
 
-  static createFromDB(ratingInfo: ActorRatingConstructor): IActorRatingModel {
+  static createBasic(ratingInfo: ActorRatingConstructor): IActorRatingModel {
     return new ActorRating(ratingInfo);
   }
 }

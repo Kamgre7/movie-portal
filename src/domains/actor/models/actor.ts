@@ -42,7 +42,7 @@ export class Actor implements IActorModel {
     return new Actor(actorInfo, rating);
   }
 
-  static createFromDB(actorInfo: ActorConstructor): IActorModel {
+  static createBasic(actorInfo: ActorConstructor): IActorModel {
     return new Actor(actorInfo);
   }
 }

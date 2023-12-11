@@ -42,7 +42,7 @@ export class ActorRepository implements IActorRepository {
       return Actor.createWithRating(actor, rating);
     }
 
-    return Actor.createFromDB(actor);
+    return Actor.createBasic(actor);
   }
 
   async findByCriteria(criteria: ActorCriteria, withRating: boolean): Promise<IActorModel[]> {
@@ -74,7 +74,7 @@ export class ActorRepository implements IActorRepository {
         .returningAll()
         .executeTakeFirstOrThrow();
 
-      return Actor.createFromDB(actor);
+      return Actor.createBasic(actor);
     } catch (err) {
       throw this.errorMapper.mapRepositoryError(err);
     }
