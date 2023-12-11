@@ -11,7 +11,6 @@ export type ActorInMovie = {
 export interface IActorsMoviesRepository {
   find(actorId: string, movieId: string): Promise<ActorInMovie | null>;
   findAll(movieId: string): Promise<ActorInMovie[]>;
-  findByActors(actorIds: string[], movieId: string): Promise<ActorInMovie[]>;
   addActor(actorId: string, movieId: string): Promise<ActorInMovie>;
 }
 
@@ -46,27 +45,15 @@ export class ActorsMoviesRepository implements IActorsMoviesRepository {
     return actorInMovie;
   }
 
-  async findByActors(actorIds: string[], movieId: string): Promise<ActorInMovie[]> {
-    const movies = await this.db
-      .selectFrom(this.actorsMoviesTable)
-      .where('movieId', '=', movieId)
-      .where('actorId', 'in', actorIds)
-      .selectAll()
-      .distinctOn('actors_movies.movieId')
-      .execute();
-
-    return movies;
-  }
-
   async addActor(actorId: string, movieId: string): Promise<ActorInMovie> {
     try {
-      const rate = await this.db
+      const actor = await this.db
         .insertInto(this.actorsMoviesTable)
         .values({ actorId, movieId })
         .returningAll()
         .executeTakeFirstOrThrow();
 
-      return rate;
+      return actor;
     } catch (err) {
       throw this.errorMapper.mapRepositoryError(err);
     }
