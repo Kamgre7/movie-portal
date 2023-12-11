@@ -28,7 +28,7 @@ export class UserRepository implements IUserRepository {
       .selectAll()
       .executeTakeFirst();
 
-    return user ? User.createFromDB(user) : null;
+    return user ? User.createBasic(user) : null;
   }
 
   async findByEmail(email: string): Promise<IUserModel | null> {
@@ -38,7 +38,7 @@ export class UserRepository implements IUserRepository {
       .selectAll()
       .executeTakeFirst();
 
-    return user ? User.createFromDB(user) : null;
+    return user ? User.createBasic(user) : null;
   }
 
   async create(newUser: NewUser): Promise<IUserModel> {
@@ -49,7 +49,7 @@ export class UserRepository implements IUserRepository {
         .returningAll()
         .executeTakeFirstOrThrow();
 
-      return User.createFromDB(user);
+      return User.createBasic(user);
     } catch (err) {
       throw this.errorMapper.mapRepositoryError(err);
     }

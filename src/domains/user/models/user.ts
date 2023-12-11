@@ -48,7 +48,7 @@ export class User implements IUserModel {
     }
   }
 
-  static createFromDB(userInfo: UserConstructor): IUserModel {
+  static createBasic(userInfo: UserConstructor): IUserModel {
     return new User(userInfo);
   }
 
