@@ -34,6 +34,8 @@ import {
   IRefreshTokenRepository,
   RefreshTokenRepository,
 } from '../domains/auth/repository/refreshTokenRepository';
+import { IJwtCreator, JwtCreator } from '../domains/auth/jwt/jwtCreator';
+import { Auth, IAuth } from '../middlewares/auth';
 
 export const container = new Container();
 
@@ -49,12 +51,14 @@ container.bind<IUserController>(TYPES.UserControllerToken).to(UserController);
 container.bind<IWatchListRepository>(TYPES.UserWatchListRepositoryToken).to(WatchListRepository);
 
 //auth
+container.bind<IAuth>(TYPES.AuthToken).to(Auth);
 container.bind<IAuthService>(TYPES.AuthServiceToken).to(AuthService);
 container.bind<IAuthController>(TYPES.AuthControllerToken).to(AuthController);
 container.bind<IJwtManager>(TYPES.JwtManagerToken).to(JwtManager);
 container
   .bind<IRefreshTokenRepository>(TYPES.RefreshTokenRepositoryToken)
   .to(RefreshTokenRepository);
+container.bind<IJwtCreator>(TYPES.JwtCreatorToken).to(JwtCreator);
 
 // movies
 container.bind<IMovieRepository>(TYPES.MovieRepositoryToken).to(MovieRepository);

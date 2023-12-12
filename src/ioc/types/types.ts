@@ -1,9 +1,11 @@
 export const TYPES = {
   PasswordManagerToken: Symbol.for('IPasswordManager'),
 
+  AuthToken: Symbol.for('IAuth'),
   AuthServiceToken: Symbol.for('IAuthService'),
   AuthControllerToken: Symbol.for('IAuthController'),
   JwtManagerToken: Symbol.for('IJwtManager'),
+  JwtCreatorToken: Symbol.for('IJwtCreator'),
   RefreshTokenRepositoryToken: Symbol.for('IRefreshTokenRepository'),
 
   UserRepositoryToken: Symbol.for('IUserRepository'),
