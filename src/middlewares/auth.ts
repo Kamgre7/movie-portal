@@ -1,28 +1,38 @@
 import { NextFunction, Request, Response } from 'express';
 import { UnauthorizedError } from '../errors/unauthorizedError';
-import { JwtPayload, verify } from 'jsonwebtoken';
+import { inject, injectable } from 'inversify';
+import { TYPES } from '../ioc/types/types';
+import { IJwtCreator } from '../domains/auth/jwt/jwtCreator';
 import { jwtConfig } from '../domains/auth/jwt/jwtConfig';
 
-export const auth = (req: Request, res: Response, next: NextFunction) => {
-  const authHeader = req.headers['authorization'];
+export interface IAuth {
+  verifyUser(req: Request, res: Response, next: NextFunction): void;
+}
 
-  const token = authHeader && authHeader.split(' ')[1];
+@injectable()
+export class Auth implements IAuth {
+  constructor(
+    @inject(TYPES.JwtCreatorToken)
+    private readonly jwtCreator: IJwtCreator
+  ) {}
 
-  if (!token) {
-    throw new UnauthorizedError('Unauthorized');
-  }
+  verifyUser(req: Request, res: Response, next: NextFunction): void {
+    const authHeader = req.headers['authorization'];
 
-  try {
-    const payload = verify(token, jwtConfig.jwtTokenSecret) as JwtPayload;
+    const token = authHeader && authHeader.split(' ')[1];
+
+    if (!token) {
+      throw new UnauthorizedError('Unauthorized');
+    }
+
+    const payload = this.jwtCreator.verify(token, jwtConfig.jwtTokenSecret);
 
     res.locals.user = {
       id: payload.id,
       email: payload.email,
       role: payload.role,
     };
-  } catch (err) {
-    throw new UnauthorizedError('Unauthorized');
-  }
 
-  next();
-};
+    next();
+  }
+}
