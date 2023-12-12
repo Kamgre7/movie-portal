@@ -1,8 +1,9 @@
-import { injectable } from 'inversify';
-import { JwtPayload, sign, verify } from 'jsonwebtoken';
+import { inject, injectable } from 'inversify';
 import { jwtConfig } from './jwtConfig';
 import { UnauthorizedError } from '../../../errors/unauthorizedError';
 import { RoleType } from '../../user/types/userRole';
+import { TYPES } from '../../../ioc/types/types';
+import { IJwtCreator } from './jwtCreator';
 
 export interface UserPayload {
   id: string;
@@ -25,16 +26,19 @@ export class JwtManager implements IJwtManager {
   private readonly accessTokenExpiresIn = jwtConfig.jwtTokenExpireInDays * 60 * 60 * 24;
   private readonly refreshTokenExpiresIn = jwtConfig.jwtRefreshTokenExpireInDays * 60 * 60 * 24;
 
-  constructor() {}
+  constructor(
+    @inject(TYPES.JwtCreatorToken)
+    private readonly jwtCreator: IJwtCreator
+  ) {}
 
   createToken(payload: UserPayload): TokenPair {
-    const accessToken = this.generateToken(
+    const accessToken = this.jwtCreator.generate(
       payload,
       jwtConfig.jwtTokenSecret,
       this.accessTokenExpiresIn
     );
 
-    const refreshToken = this.generateToken(
+    const refreshToken = this.jwtCreator.generate(
       payload,
       jwtConfig.jwtRefreshTokenSecret,
       this.refreshTokenExpiresIn
@@ -45,9 +49,9 @@ export class JwtManager implements IJwtManager {
 
   refreshToken(refreshToken: string): string {
     try {
-      const payload = verify(refreshToken, jwtConfig.jwtRefreshTokenSecret) as JwtPayload;
+      const payload = this.jwtCreator.verify(refreshToken, jwtConfig.jwtRefreshTokenSecret);
 
-      const newAccessToken = this.generateToken(
+      const newAccessToken = this.jwtCreator.generate(
         { email: payload.email, id: payload.id, role: payload.role },
         jwtConfig.jwtTokenSecret,
         this.accessTokenExpiresIn
@@ -57,9 +61,5 @@ export class JwtManager implements IJwtManager {
     } catch (err) {
       throw new UnauthorizedError('Unauthorized');
     }
-  }
-
-  private generateToken(payload: UserPayload, secretToken: string, expiresIn: number): string {
-    return sign(payload, secretToken, { expiresIn });
   }
 }
