@@ -16,7 +16,7 @@ export class Auth implements IAuth {
     private readonly jwtCreator: IJwtCreator
   ) {}
 
-  verifyUser(req: Request, res: Response, next: NextFunction): void {
+  verifyUser = (req: Request, res: Response, next: NextFunction): void => {
     const authHeader = req.headers['authorization'];
 
     const token = authHeader && authHeader.split(' ')[1];
@@ -34,5 +34,5 @@ export class Auth implements IAuth {
     };
 
     next();
-  }
+  };
 }
