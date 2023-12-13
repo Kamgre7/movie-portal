@@ -27,4 +27,6 @@ export const TYPES = {
   ActorMoviesRepositoryToken: Symbol.for('IActorsMoviesRepository'),
 
   ErrorMapperToken: Symbol.for('IErrorMapper'),
+
+  UserRoleValidatorToken: Symbol.for('IUserRoleValidator'),
 };

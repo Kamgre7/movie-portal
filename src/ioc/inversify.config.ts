@@ -36,6 +36,7 @@ import {
 } from '../domains/auth/repository/refreshTokenRepository';
 import { IJwtCreator, JwtCreator } from '../domains/auth/jwt/jwtCreator';
 import { Auth, IAuth } from '../middlewares/auth';
+import { IUserRoleValidator, UserRoleValidator } from '../middlewares/userRoleValidator';
 
 export const container = new Container();
 
@@ -83,3 +84,6 @@ container
 
 // errorMapper
 container.bind<IErrorMapper>(TYPES.ErrorMapperToken).to(ErrorMapper);
+
+// userRoleValidator
+container.bind<IUserRoleValidator>(TYPES.UserRoleValidatorToken).to(UserRoleValidator);
