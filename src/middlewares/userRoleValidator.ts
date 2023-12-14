@@ -16,8 +16,8 @@ export class UserRoleValidator implements IUserRoleValidator {
 
     if (user && user.role === ROLE.ADMIN) {
       next();
+    } else {
+      throw new ForbiddenError('For admin only');
     }
-
-    throw new ForbiddenError('For admin only');
   };
 }
