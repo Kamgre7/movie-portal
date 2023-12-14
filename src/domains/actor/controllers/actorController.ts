@@ -60,9 +60,12 @@ export class ActorController implements IActorController {
   };
 
   rate = async (req: ParsedRequest<RateActorReq>, res: Response): Promise<void> => {
+    const user = res.locals.user;
+
     const rateInfo = {
       ...req.params,
       ...req.body,
+      userId: user.id,
     };
 
     const rating = await this.actorService.rate(rateInfo);
@@ -73,9 +76,12 @@ export class ActorController implements IActorController {
   };
 
   updateRate = async (req: ParsedRequest<RateActorReq>, res: Response): Promise<void> => {
+    const user = res.locals.user;
+
     const rateInfo = {
       ...req.params,
       ...req.body,
+      userId: user.id,
     };
 
     await this.actorService.updateRate(rateInfo);
