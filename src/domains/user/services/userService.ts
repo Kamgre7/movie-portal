@@ -16,6 +16,7 @@ export interface IUserService {
   findById(id: string): Promise<IUserModel>;
 
   addMovieToWatchList(watchListData: WatchListInfo): Promise<UserWatchList>;
+  getWatchList(userId: string): Promise<UserWatchList[]>;
 }
 
 @injectable()
@@ -53,5 +54,9 @@ export class UserService implements IUserService {
 
   async addMovieToWatchList(watchListData: WatchListInfo): Promise<UserWatchList> {
     return this.watchListRepository.addMovie(watchListData);
+  }
+
+  async getWatchList(userId: string): Promise<UserWatchList[]> {
+    return this.watchListRepository.getAll(userId);
   }
 }
