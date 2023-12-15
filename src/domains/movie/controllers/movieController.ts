@@ -67,7 +67,8 @@ export class MovieController implements IMovieController {
   rate = async (req: ParsedRequest<RateMovieReq>, res: Response): Promise<void> => {
     const rating = {
       movieId: req.params.id,
-      ...req.body,
+      rating: req.body.rating,
+      userId: res.locals.user.id,
     };
 
     const ratingInfo = await this.movieService.rate(rating);
@@ -80,7 +81,8 @@ export class MovieController implements IMovieController {
   updateRate = async (req: ParsedRequest<RateMovieReq>, res: Response): Promise<void> => {
     const rating = {
       movieId: req.params.id,
-      ...req.body,
+      rating: req.body.rating,
+      userId: res.locals.user.id,
     };
 
     await this.movieService.updateRate(rating);
