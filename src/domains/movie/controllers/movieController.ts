@@ -87,12 +87,12 @@ export class MovieController implements IMovieController {
 
     await this.movieService.updateRate(rating);
 
-    res.status(204).end();
+    res.sendStatus(204);
   };
 
   addActorsToMovie = async (req: ParsedRequest<AddActorMovieReq>, res: Response) => {
     await this.movieService.addActorsToMovie(req.params.id, req.body.actorIds);
 
-    res.status(204).end();
+    res.sendStatus(204);
   };
 }

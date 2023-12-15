@@ -86,6 +86,6 @@ export class ActorController implements IActorController {
 
     await this.actorService.updateRate(rateInfo);
 
-    res.status(204).end();
+    res.sendStatus(204);
   };
 }
