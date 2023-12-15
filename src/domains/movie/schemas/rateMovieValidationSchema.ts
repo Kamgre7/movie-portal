@@ -5,7 +5,6 @@ export const RateMovieSchema = z.object({
     id: z.string().uuid(),
   }),
   body: z.object({
-    userId: z.string().uuid(),
     rating: z.coerce.number().int().min(1).max(5),
   }),
 });
