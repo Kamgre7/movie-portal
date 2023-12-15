@@ -10,3 +10,11 @@ export const AddMovieToWatchListSchema = z.object({
 });
 
 export type AddMovieToWatchListReq = z.infer<typeof AddMovieToWatchListSchema>;
+
+export const GetMovieWatchListSchema = z.object({
+  params: z.object({
+    id: z.string().uuid(),
+  }),
+});
+
+export type GetMovieWatchListReq = z.infer<typeof GetMovieWatchListSchema>;
