@@ -8,6 +8,8 @@ export const DbSchema = z.object({
   dbPort: z.coerce.number(),
 });
 
+export type DbConfig = z.infer<typeof DbSchema>;
+
 export const dbConfig = DbSchema.parse({
   dbHost: process.env.DB_HOST,
   dbUser: process.env.DB_USER,
