@@ -1,11 +1,12 @@
 import * as path from 'path';
 import { promises as fs } from 'fs';
-import { Migrator, FileMigrationProvider } from 'kysely';
+import { Migrator, FileMigrationProvider, Kysely } from 'kysely';
 import { database } from './database';
+import { Database } from './schemas/database.schema';
 
-async function migrateToLatest() {
+async function migrateToLatest(db: Kysely<Database>) {
   const migrator = new Migrator({
-    db: database,
+    db,
     provider: new FileMigrationProvider({
       fs,
       path,
@@ -29,7 +30,7 @@ async function migrateToLatest() {
     process.exit(1);
   }
 
-  await database.destroy();
+  await db.destroy();
 }
 
-migrateToLatest();
+migrateToLatest(database);
