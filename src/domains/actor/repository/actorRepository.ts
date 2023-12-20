@@ -63,7 +63,7 @@ export class ActorRepository implements IActorRepository {
       return actors.map((actor, index) => Actor.createWithRating(actor, actorsRating[index]));
     }
 
-    return actors;
+    return actors.map((actor) => Actor.createBasic(actor));
   }
 
   async create(newActor: NewActor): Promise<IActorModel> {
