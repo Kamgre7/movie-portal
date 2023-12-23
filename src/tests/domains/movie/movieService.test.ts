@@ -21,11 +21,23 @@ import { IUserRepository, UserRepository } from '../../../domains/user/repositor
 import { GENDER } from '../../../domains/user/types/genderType';
 import { NewUser } from '../../../domains/user/schemas/createUserValidationSchema';
 import { MovieRating } from '../../../domains/movie/models/movieRating';
+import {
+  ActorRepository,
+  IActorRepository,
+} from '../../../domains/actor/repository/actorRepository';
+import {
+  ActorRatingRepository,
+  IActorRatingRepository,
+} from '../../../domains/actor/repository/actorRatingRepository';
+import { NewActor } from '../../../domains/actor/schemas/createActorValidationSchema';
 
 describe('Movie service', () => {
   let movieInfo: NewMovie;
   let userInfo: NewUser;
+  let actorInfo: NewActor;
   let errorMapper: IErrorMapper;
+  let actorRepository: IActorRepository;
+  let actorRatingRepository: IActorRatingRepository;
   let movieRepository: IMovieRepository;
   let movieRatingRepository: IMovieRatingRepository;
   let actorsMoviesRepository: IActorsMoviesRepository;
@@ -35,6 +47,8 @@ describe('Movie service', () => {
   beforeAll(async () => {
     errorMapper = new ErrorMapper();
 
+    actorRatingRepository = new ActorRatingRepository(errorMapper, testDb);
+    actorRepository = new ActorRepository(errorMapper, actorRatingRepository, testDb);
     movieRatingRepository = new MovieRatingRepository(errorMapper, testDb);
     actorsMoviesRepository = new ActorsMoviesRepository(errorMapper, testDb);
     movieRepository = new MovieRepository(
@@ -44,7 +58,6 @@ describe('Movie service', () => {
       testDb
     );
     userRepository = new UserRepository(errorMapper, testDb);
-    actorsMoviesRepository = new ActorsMoviesRepository(errorMapper, testDb);
     movieService = new MovieService(movieRepository, movieRatingRepository, actorsMoviesRepository);
   });
 
@@ -62,10 +75,17 @@ describe('Movie service', () => {
       gender: GENDER.MALE,
       password: '1234',
     };
+
+    actorInfo = {
+      firstName: 'Joe',
+      lastName: 'Smith',
+      gender: GENDER.MALE,
+    };
   });
 
   afterEach(async () => {
     await testDb.deleteFrom('users_movies_ratings').execute();
+    await testDb.deleteFrom('actors_movies').execute();
     await testDb.deleteFrom('movies').execute();
     await testDb.deleteFrom('users').execute();
   });
@@ -75,7 +95,7 @@ describe('Movie service', () => {
   });
 
   describe('Movie', () => {
-    it('Should return new movie', async () => {
+    it('Should create movie in db', async () => {
       const movie = await movieService.create(movieInfo);
 
       expect(movie).toBeInstanceOf(Movie);
@@ -156,6 +176,39 @@ describe('Movie service', () => {
     });
   });
 
+  describe('Movie with rating and actors', () => {
+    it('Should return movie with rating', async () => {
+      const movie = await movieRepository.create(movieInfo);
+      const user = await userRepository.create(userInfo);
+      const rate = await movieRatingRepository.rate({
+        movieId: movie.id,
+        userId: user.id,
+        rating: 5,
+      });
+
+      const foundMovie = await movieService.findById(movie.id, {
+        withActors: false,
+        withRating: true,
+      });
+
+      expect(foundMovie.rating).toContainEqual({ userId: user.id, rating: rate.rating });
+    });
+
+    it('Should return movie with actors', async () => {
+      const movie = await movieRepository.create(movieInfo);
+      const actor = await actorRepository.create(actorInfo);
+
+      await movieService.addActorsToMovie(movie.id, [actor.id]);
+
+      const foundMovie = await movieService.findById(movie.id, {
+        withActors: true,
+        withRating: false,
+      });
+
+      expect(foundMovie.actors).toContainEqual({ movieId: movie.id, actorId: actor.id });
+    });
+  });
+
   describe('Should throw error when', () => {
     describe('Movie', () => {
       it('Should throw error when trying to create a movie with the same title second time', async () => {
@@ -208,6 +261,24 @@ describe('Movie service', () => {
             userId: user.id,
             rating: 5,
           });
+        }).rejects.toThrow();
+      });
+    });
+
+    describe('Movie with actors', () => {
+      it('Should throw error when, trying to add actor who do not exist', async () => {
+        const movie = await movieRepository.create(movieInfo);
+
+        await expect(async () => {
+          await movieService.addActorsToMovie(movie.id, [uuid()]);
+        }).rejects.toThrow();
+      });
+
+      it('Should throw error when, trying to add actor to movie which do not exist', async () => {
+        const actor = await actorRepository.create(actorInfo);
+
+        await expect(async () => {
+          await movieService.addActorsToMovie(uuid(), [actor.id]);
         }).rejects.toThrow();
       });
     });
