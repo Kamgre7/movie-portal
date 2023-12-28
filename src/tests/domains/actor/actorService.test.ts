@@ -29,7 +29,6 @@ import {
   IMovieRatingRepository,
   MovieRatingRepository,
 } from '../../../domains/movie/repository/movieRatingRepository';
-import { MovieService } from '../../../domains/movie/services/movieService';
 import { ActorRating } from '../../../domains/actor/models/actorRating';
 
 describe('Actor service', () => {
