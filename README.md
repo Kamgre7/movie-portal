@@ -6,7 +6,7 @@ Movie Portal is a web application which provides a platform for users to interac
 
 ### Features
 
-- User authentication via Gmail
+- User authentication
 - Movie rating (1 to 5 stars)
 - Actor rating per movie (1 to 5 stars)
 - Movie catalog creation
@@ -14,7 +14,6 @@ Movie Portal is a web application which provides a platform for users to interac
   a) Category <br />
   b) Release date <br />
   c) Director <br />
-  d) Actor <br />
 - Movie retrieval by: <br />
   a) ID <br />
   b) Title <br />
@@ -38,11 +37,11 @@ Movie Portal is a web application which provides a platform for users to interac
 
 ### Allowed actions
 
-- Log in with your Gmail account to access the platform's features
+- Log in/register account to access the platform's features
 - Rate movies on a scale from 1 to 5 stars
 - Rate actors per movie, also on a scale from 1 to 5 stars
 - Create your own movie catalog
-- Utilize advanced filtering options to search for movies based on category, release date, director, actor, or genre
+- Utilize advanced filtering options to search for movies based on category, release date, director or genre
 - Retrieve detailed movie information by ID, title, or genre.
 - Retrieve detailed actor information by ID or full name.
 
