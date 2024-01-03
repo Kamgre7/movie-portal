@@ -1,61 +1,31 @@
 import { v4 as uuid } from 'uuid';
-import {
-  ActorsMoviesRepository,
-  IActorsMoviesRepository,
-} from '../../../domains/actor/repository/actorMovieRepository';
-import {
-  IMovieRatingRepository,
-  MovieRatingRepository,
-} from '../../../domains/movie/repository/movieRatingRepository';
-import {
-  IMovieRepository,
-  MovieRepository,
-} from '../../../domains/movie/repository/movieRepository';
+import { IMovieRepository } from '../../../domains/movie/repository/movieRepository';
 import { NewMovie } from '../../../domains/movie/schemas/createMovieValidationSchema';
 import { CATEGORY } from '../../../domains/movie/types/categoryType';
-import {
-  IPasswordManager,
-  PasswordManager,
-} from '../../../domains/passwordManager/passwordManager';
 import { User } from '../../../domains/user/models/user';
-import { IUserRepository, UserRepository } from '../../../domains/user/repository/userRepository';
-import {
-  IWatchListRepository,
-  WatchListRepository,
-} from '../../../domains/user/repository/watchilistRepository';
+import { IUserRepository } from '../../../domains/user/repository/userRepository';
+import { IWatchListRepository } from '../../../domains/user/repository/watchilistRepository';
 import { NewUser } from '../../../domains/user/schemas/createUserValidationSchema';
-import { IUserService, UserService } from '../../../domains/user/services/userService';
+import { IUserService } from '../../../domains/user/services/userService';
 import { GENDER } from '../../../domains/user/types/genderType';
-import { ErrorMapper, IErrorMapper } from '../../../errors/errorMapper';
 import { testDb } from '../../testDatabase';
+import { container } from '../../../ioc/inversify.config';
+import { TYPES } from '../../../ioc/types/types';
+import { database } from '../../../database/database';
 
 describe('User service', () => {
   let userInfo: NewUser;
   let movieInfo: NewMovie;
-  let errorMapper: IErrorMapper;
   let movieRepository: IMovieRepository;
   let watchListRepository: IWatchListRepository;
-  let movieRatingRepository: IMovieRatingRepository;
-  let actorsMoviesRepository: IActorsMoviesRepository;
   let userRepository: IUserRepository;
-  let passwordManager: IPasswordManager;
   let userService: IUserService;
 
   beforeAll(async () => {
-    errorMapper = new ErrorMapper();
-
-    movieRatingRepository = new MovieRatingRepository(errorMapper, testDb);
-    actorsMoviesRepository = new ActorsMoviesRepository(errorMapper, testDb);
-    movieRepository = new MovieRepository(
-      errorMapper,
-      movieRatingRepository,
-      actorsMoviesRepository,
-      testDb
-    );
-    watchListRepository = new WatchListRepository(errorMapper, testDb);
-    userRepository = new UserRepository(errorMapper, testDb);
-    passwordManager = new PasswordManager();
-    userService = new UserService(passwordManager, userRepository, watchListRepository);
+    movieRepository = container.get<IMovieRepository>(TYPES.MovieRepositoryToken);
+    watchListRepository = container.get<IWatchListRepository>(TYPES.UserWatchListRepositoryToken);
+    userRepository = container.get<IUserRepository>(TYPES.UserRepositoryToken);
+    userService = container.get<IUserService>(TYPES.UserServiceToken);
   });
 
   beforeEach(() => {
@@ -82,6 +52,7 @@ describe('User service', () => {
 
   afterAll(async () => {
     await testDb.destroy();
+    await database.destroy();
   });
 
   describe('User', () => {
