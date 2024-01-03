@@ -1,64 +1,37 @@
 import { v4 as uuid } from 'uuid';
-import {
-  ActorsMoviesRepository,
-  IActorsMoviesRepository,
-} from '../../../domains/actor/repository/actorMovieRepository';
 import { Movie } from '../../../domains/movie/models/movie';
-import {
-  IMovieRatingRepository,
-  MovieRatingRepository,
-} from '../../../domains/movie/repository/movieRatingRepository';
-import {
-  IMovieRepository,
-  MovieRepository,
-} from '../../../domains/movie/repository/movieRepository';
+import { IMovieRatingRepository } from '../../../domains/movie/repository/movieRatingRepository';
+import { IMovieRepository } from '../../../domains/movie/repository/movieRepository';
 import { NewMovie } from '../../../domains/movie/schemas/createMovieValidationSchema';
-import { IMovieService, MovieService } from '../../../domains/movie/services/movieService';
+import { IMovieService } from '../../../domains/movie/services/movieService';
 import { CATEGORY } from '../../../domains/movie/types/categoryType';
-import { ErrorMapper, IErrorMapper } from '../../../errors/errorMapper';
 import { testDb } from '../../testDatabase';
-import { IUserRepository, UserRepository } from '../../../domains/user/repository/userRepository';
+import { IUserRepository } from '../../../domains/user/repository/userRepository';
 import { GENDER } from '../../../domains/user/types/genderType';
 import { NewUser } from '../../../domains/user/schemas/createUserValidationSchema';
 import { MovieRating } from '../../../domains/movie/models/movieRating';
-import {
-  ActorRepository,
-  IActorRepository,
-} from '../../../domains/actor/repository/actorRepository';
-import {
-  ActorRatingRepository,
-  IActorRatingRepository,
-} from '../../../domains/actor/repository/actorRatingRepository';
+import { IActorRepository } from '../../../domains/actor/repository/actorRepository';
 import { NewActor } from '../../../domains/actor/schemas/createActorValidationSchema';
+import { container } from '../../../ioc/inversify.config';
+import { TYPES } from '../../../ioc/types/types';
+import { database } from '../../../database/database';
 
 describe('Movie service', () => {
   let movieInfo: NewMovie;
   let userInfo: NewUser;
   let actorInfo: NewActor;
-  let errorMapper: IErrorMapper;
   let actorRepository: IActorRepository;
-  let actorRatingRepository: IActorRatingRepository;
   let movieRepository: IMovieRepository;
   let movieRatingRepository: IMovieRatingRepository;
-  let actorsMoviesRepository: IActorsMoviesRepository;
   let movieService: IMovieService;
   let userRepository: IUserRepository;
 
   beforeAll(async () => {
-    errorMapper = new ErrorMapper();
-
-    actorRatingRepository = new ActorRatingRepository(errorMapper, testDb);
-    actorRepository = new ActorRepository(errorMapper, actorRatingRepository, testDb);
-    movieRatingRepository = new MovieRatingRepository(errorMapper, testDb);
-    actorsMoviesRepository = new ActorsMoviesRepository(errorMapper, testDb);
-    movieRepository = new MovieRepository(
-      errorMapper,
-      movieRatingRepository,
-      actorsMoviesRepository,
-      testDb
-    );
-    userRepository = new UserRepository(errorMapper, testDb);
-    movieService = new MovieService(movieRepository, movieRatingRepository, actorsMoviesRepository);
+    actorRepository = container.get<IActorRepository>(TYPES.ActorRepositoryToken);
+    movieRatingRepository = container.get<IMovieRatingRepository>(TYPES.MovieRatingRepositoryToken);
+    movieRepository = container.get<IMovieRepository>(TYPES.MovieRepositoryToken);
+    userRepository = container.get<IUserRepository>(TYPES.UserRepositoryToken);
+    movieService = container.get<IMovieService>(TYPES.MovieServiceToken);
   });
 
   beforeEach(() => {
@@ -92,6 +65,7 @@ describe('Movie service', () => {
 
   afterAll(async () => {
     await testDb.destroy();
+    await database.destroy();
   });
 
   describe('Movie', () => {
