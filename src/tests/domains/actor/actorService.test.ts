@@ -1,18 +1,8 @@
 import { v4 as uuid } from 'uuid';
-import { ActorService, IActorService } from '../../../domains/actor/services/actorService';
-import {
-  ActorRepository,
-  IActorRepository,
-} from '../../../domains/actor/repository/actorRepository';
-import { ErrorMapper, IErrorMapper } from '../../../errors/errorMapper';
-import {
-  ActorRatingRepository,
-  IActorRatingRepository,
-} from '../../../domains/actor/repository/actorRatingRepository';
-import {
-  ActorsMoviesRepository,
-  IActorsMoviesRepository,
-} from '../../../domains/actor/repository/actorMovieRepository';
+import { IActorService } from '../../../domains/actor/services/actorService';
+import { IActorRepository } from '../../../domains/actor/repository/actorRepository';
+import { IActorRatingRepository } from '../../../domains/actor/repository/actorRatingRepository';
+import { IActorsMoviesRepository } from '../../../domains/actor/repository/actorMovieRepository';
 import { Actor } from '../../../domains/actor/models/actor';
 import { testDb } from '../../testDatabase';
 import { NewActor } from '../../../domains/actor/schemas/createActorValidationSchema';
@@ -20,23 +10,17 @@ import { CATEGORY } from '../../../domains/movie/types/categoryType';
 import { GENDER } from '../../../domains/user/types/genderType';
 import { NewMovie } from '../../../domains/movie/schemas/createMovieValidationSchema';
 import { NewUser } from '../../../domains/user/schemas/createUserValidationSchema';
-import {
-  IMovieRepository,
-  MovieRepository,
-} from '../../../domains/movie/repository/movieRepository';
-import { IUserRepository, UserRepository } from '../../../domains/user/repository/userRepository';
-import {
-  IMovieRatingRepository,
-  MovieRatingRepository,
-} from '../../../domains/movie/repository/movieRatingRepository';
+import { IMovieRepository } from '../../../domains/movie/repository/movieRepository';
+import { IUserRepository } from '../../../domains/user/repository/userRepository';
 import { ActorRating } from '../../../domains/actor/models/actorRating';
+import { container } from '../../../ioc/inversify.config';
+import { TYPES } from '../../../ioc/types/types';
+import { database } from '../../../database/database';
 
 describe('Actor service', () => {
   let actorInfo: NewActor;
   let movieInfo: NewMovie;
   let userInfo: NewUser;
-  let movieRatingRepository: IMovieRatingRepository;
-  let errorMapper: IErrorMapper;
   let movieRepository: IMovieRepository;
   let userRepository: IUserRepository;
   let actorRatingRepository: IActorRatingRepository;
@@ -45,19 +29,14 @@ describe('Actor service', () => {
   let actorsMoviesRepository: IActorsMoviesRepository;
 
   beforeAll(async () => {
-    errorMapper = new ErrorMapper();
-    userRepository = new UserRepository(errorMapper, testDb);
-    actorRatingRepository = new ActorRatingRepository(errorMapper, testDb);
-    actorsMoviesRepository = new ActorsMoviesRepository(errorMapper, testDb);
-    actorRepository = new ActorRepository(errorMapper, actorRatingRepository, testDb);
-    movieRatingRepository = new MovieRatingRepository(errorMapper, testDb);
-    movieRepository = new MovieRepository(
-      errorMapper,
-      movieRatingRepository,
-      actorsMoviesRepository,
-      testDb
+    actorService = container.get<IActorService>(TYPES.ActorServiceToken);
+    userRepository = container.get<IUserRepository>(TYPES.UserRepositoryToken);
+    actorRatingRepository = container.get<IActorRatingRepository>(TYPES.ActorRatingRepositoryToken);
+    actorsMoviesRepository = container.get<IActorsMoviesRepository>(
+      TYPES.ActorMoviesRepositoryToken
     );
-    actorService = new ActorService(actorRepository, actorRatingRepository, actorsMoviesRepository);
+    actorRepository = container.get<IActorRepository>(TYPES.ActorRepositoryToken);
+    movieRepository = container.get<IMovieRepository>(TYPES.MovieRepositoryToken);
   });
 
   beforeEach(() => {
@@ -92,6 +71,7 @@ describe('Actor service', () => {
 
   afterAll(async () => {
     await testDb.destroy();
+    await database.destroy();
   });
 
   describe('Actor', () => {
