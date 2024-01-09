@@ -1,0 +1,191 @@
+openapi: 3.0.0
+info:
+  title: Movie portal - Swagger OpenAPI
+  description: This is CRUD API made with Express and documented with Swagger
+  termsOfService: http://swagger.io/terms/
+servers:
+  - url: ${HOST}:${PORT}
+tags:
+  - name: auth
+    description: Auth login/logout
+  - name: actor
+    description: Everything about actors
+  - name: movie
+    description: Everything about movies
+  - name: user
+    description: Everything about users
+paths:
+  /actors:
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - actor
+      summary: Add new actor
+      description: Add new actor
+      operationId: AddActor
+      requestBody:
+        description: Actor information
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - firstName
+                - lastName
+                - gender
+              properties:
+                firstName:
+                  type: string
+                  minLength: 3
+                  example: Joe
+                lastName:
+                  type: string
+                  minLength: 3
+                  example: Doe
+                gender:
+                  type: string
+                  enum:
+                    - male
+                    - female
+                  example: male
+      responses:
+        '201':
+          description: Successful operation - actor created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Actor'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+  /actors/search:
+    get:
+      tags:
+        - actor
+      summary: Get actors by criteria
+      description: Get all actors by criteria
+      operationId: GetActorsByCriteria
+      parameters:
+        - name: firstName
+          in: query
+          description: first name of actor
+          required: false
+          schema:
+            type: string
+            minLength: 1
+            example: John
+        - name: lastName
+          in: query
+          description: last name of actor
+          required: false
+          schema:
+            type: string
+            minLength: 1
+            example: Smith
+        - name: withRating
+          in: query
+          description: find actor with ratings in movies
+          required: false
+          schema:
+            type: boolean
+            example: true
+      responses:
+        '200':
+          description: Success operation - return array with actors
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ActorWithRating'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  responses:
+    UnauthorizedError:
+      description: Access token is missing or invalid
+    BadRequestError:
+      description: Invalid data
+    NotFoundError:
+      description: Not found
+    ForbiddenError:
+      description: Must be admin
+  schemas:
+    ActorRating:
+      type: object
+      required:
+        - userId
+        - movieId
+        - rating
+      properties:
+        userId:
+          type: string
+          format: uuid
+          example: 82a99346-3227-41a1-beb0-1bdfd7c00351
+        movieId:
+          type: string
+          format: uuid
+          example: 4953bb39-72d1-4497-b9b2-fbb29a0252ae
+        rating:
+          type: integer
+          minimum: 1
+          maximum: 5
+          example: 3
+    Actor:
+      type: object
+      required:
+        - id
+        - firstName
+        - lastName
+        - gender
+        - createdAt
+        - updatedAt
+        - deletedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: aa403449-20d8-4350-8847-9acea256c260
+        firstName:
+          type: string
+          example: John
+        lastName:
+          type: string
+          example: Smith
+        gender:
+          type: string
+          enum:
+            - male
+            - female
+          example: male
+        createdAt:
+          type: string
+          format: date-time
+          example: '2022-01-01T12:00:00Z'
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2022-05-01T12:00:00Z'
+        deletedAt:
+          type: string
+          format: date-time
+          nullable: true
+          example: null
+    ActorWithRating:
+      allOf:
+        - $ref: '#/components/schemas/Actor'
+      properties:
+        rating:
+          type: array
+          items:
+            $ref: '#/components/schemas/ActorRating'
