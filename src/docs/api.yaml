@@ -63,6 +63,105 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         '403':
           $ref: '#/components/responses/ForbiddenError'
+  /actors/{actorId}/rate/movies/${movieId}:
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - actor
+      summary: Rate actor
+      description: Rate actor
+      operationId: RateActor
+      parameters:
+        - name: actorId
+          in: path
+          description: The ID of the actor
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: aa403449-20d8-4350-8847-9acea256c260
+        - name: movieId
+          in: path
+          description: The ID of the movie
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: 091b9b53-432f-4e04-87b6-5c7990b506e9
+      requestBody:
+        description: Actor rate
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - rating
+              properties:
+                rating:
+                  type: integer
+                  minimum: 1
+                  maximum: 5
+                  example: 3
+      responses:
+        '204':
+          description: Successful operation - actor rated by user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActorRating'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+    patch:
+      security:
+        - bearerAuth: []
+      tags:
+        - actor
+      summary: Update actor rating
+      description: Update actor rating
+      operationId: UpdateActorRating
+      parameters:
+        - name: actorId
+          in: path
+          description: The ID of the actor
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: aa403449-20d8-4350-8847-9acea256c260
+        - name: movieId
+          in: path
+          description: The ID of the movie
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: 091b9b53-432f-4e04-87b6-5c7990b506e9
+      requestBody:
+        description: Actor rate
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - rating
+              properties:
+                rating:
+                  type: integer
+                  minimum: 1
+                  maximum: 5
+                  example: 1
+      responses:
+        '204':
+          description: Successful operation - actor rating updated
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
   /actors/search:
     get:
       tags:
@@ -105,6 +204,40 @@ paths:
                   $ref: '#/components/schemas/ActorWithRating'
         '400':
           $ref: '#/components/responses/BadRequestError'
+  /actors/{id}:
+    get:
+      tags:
+        - actor
+      summary: Get actor
+      description: Get actor by ID
+      operationId: GetActor
+      parameters:
+        - name: id
+          in: path
+          description: The ID of the actor
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: aa403449-20d8-4350-8847-9acea256c260
+        - name: withRating
+          in: query
+          description: find actor with ratings in movies
+          required: false
+          schema:
+            type: boolean
+            example: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActorWithRating'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
 components:
   securitySchemes:
     bearerAuth:
@@ -114,13 +247,34 @@ components:
   responses:
     UnauthorizedError:
       description: Access token is missing or invalid
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
     BadRequestError:
-      description: Invalid data
+      description: Bad request - invalid data
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
     NotFoundError:
-      description: Not found
+      description: The specified resource was not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
     ForbiddenError:
-      description: Must be admin
+      description: Access forbidden - need to be admin
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
   schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
     ActorRating:
       type: object
       required:
