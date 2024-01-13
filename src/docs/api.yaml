@@ -96,26 +96,7 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              required:
-                - firstName
-                - lastName
-                - gender
-              properties:
-                firstName:
-                  type: string
-                  minLength: 3
-                  example: Joe
-                lastName:
-                  type: string
-                  minLength: 3
-                  example: Doe
-                gender:
-                  type: string
-                  enum:
-                    - male
-                    - female
-                  example: male
+              $ref: '#/components/schemas/AddActorRequestBody'
       responses:
         '201':
           description: Successful operation - actor created
@@ -139,37 +120,15 @@ paths:
       description: Rate actor
       operationId: RateActor
       parameters:
-        - name: actorId
-          in: path
-          description: The ID of the actor
-          required: true
-          schema:
-            type: string
-            format: uuid
-            example: aa403449-20d8-4350-8847-9acea256c260
-        - name: movieId
-          in: path
-          description: The ID of the movie
-          required: true
-          schema:
-            type: string
-            format: uuid
-            example: 091b9b53-432f-4e04-87b6-5c7990b506e9
+        - $ref: '#/components/parameters/ActorId'
+        - $ref: '#/components/parameters/MovieId'
       requestBody:
         description: Actor rate
         required: true
         content:
           application/json:
             schema:
-              type: object
-              required:
-                - rating
-              properties:
-                rating:
-                  type: integer
-                  minimum: 1
-                  maximum: 5
-                  example: 3
+              $ref: '#/components/schemas/ActorRatingRequestBody'
       responses:
         '201':
           description: Successful operation - actor rated by user
@@ -190,37 +149,15 @@ paths:
       description: Update actor rating
       operationId: UpdateActorRating
       parameters:
-        - name: actorId
-          in: path
-          description: The ID of the actor
-          required: true
-          schema:
-            type: string
-            format: uuid
-            example: aa403449-20d8-4350-8847-9acea256c260
-        - name: movieId
-          in: path
-          description: The ID of the movie
-          required: true
-          schema:
-            type: string
-            format: uuid
-            example: 091b9b53-432f-4e04-87b6-5c7990b506e9
+        - $ref: '#/components/parameters/ActorId'
+        - $ref: '#/components/parameters/MovieId'
       requestBody:
         description: Actor rate
         required: true
         content:
           application/json:
             schema:
-              type: object
-              required:
-                - rating
-              properties:
-                rating:
-                  type: integer
-                  minimum: 1
-                  maximum: 5
-                  example: 1
+              $ref: '#/components/schemas/ActorRatingRequestBody'
       responses:
         '204':
           description: Successful operation - actor rating updated
@@ -236,29 +173,9 @@ paths:
       description: Get all actors by criteria
       operationId: GetActorsByCriteria
       parameters:
-        - name: firstName
-          in: query
-          description: first name of actor
-          required: false
-          schema:
-            type: string
-            minLength: 1
-            example: John
-        - name: lastName
-          in: query
-          description: last name of actor
-          required: false
-          schema:
-            type: string
-            minLength: 1
-            example: Smith
-        - name: withRating
-          in: query
-          description: find actor with ratings in movies
-          required: false
-          schema:
-            type: boolean
-            example: true
+        - $ref: '#/components/parameters/ActorFirstName'
+        - $ref: '#/components/parameters/ActorLastName'
+        - $ref: '#/components/parameters/WithRating'
       responses:
         '200':
           description: Success operation - return array with actors
@@ -286,13 +203,7 @@ paths:
             type: string
             format: uuid
             example: aa403449-20d8-4350-8847-9acea256c260
-        - name: withRating
-          in: query
-          description: find actor with ratings in movies
-          required: false
-          schema:
-            type: boolean
-            example: true
+        - $ref: '#/components/parameters/WithRating'
       responses:
         '200':
           description: Successful operation
@@ -335,6 +246,51 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
+  parameters:
+    ActorId:
+      name: actorId
+      in: path
+      description: The ID of the actor
+      required: true
+      schema:
+        type: string
+        format: uuid
+        example: aa403449-20d8-4350-8847-9acea256c260
+    MovieId:
+      name: movieId
+      in: path
+      description: The ID of the movie
+      required: true
+      schema:
+        type: string
+        format: uuid
+        example: 091b9b53-432f-4e04-87b6-5c7990b506e9
+    ActorFirstName:
+      name: firstName
+      in: query
+      description: first name of actor
+      required: false
+      schema:
+        type: string
+        minLength: 1
+        example: John
+    ActorLastName:
+      name: lastName
+      in: query
+      description: last name of actor
+      required: false
+      schema:
+        type: string
+        minLength: 1
+        example: Smith
+    WithRating:
+      name: withRating
+      in: query
+      description: find actor with ratings in movies
+      required: false
+      schema:
+        type: boolean
+        example: true
   schemas:
     Error:
       type: object
@@ -379,6 +335,37 @@ components:
         token:
           type: string
           example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2Y2E1Y2YzLTY5ZTAtNDBjYi04NjMzLTZiYzNmMGY1YjgzYiIsImVtYWlsIjoiYWRtaW5AZ21haWwuY29tIiwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzAyODUzNjM1LCJleHAiOjE3MDI5NDAwMzV9.S_M5XBbzN1ZDilk51sT9108DqLgO-lv6kLIja-YT2cM
+    AddActorRequestBody:
+      type: object
+      required:
+        - firstName
+        - lastName
+        - gender
+      properties:
+        firstName:
+          type: string
+          minLength: 3
+          example: Joe
+        lastName:
+          type: string
+          minLength: 3
+          example: Doe
+        gender:
+          type: string
+          enum:
+            - male
+            - female
+          example: male
+    ActorRatingRequestBody:
+      type: object
+      required:
+        - rating
+      properties:
+        rating:
+          type: integer
+          minimum: 1
+          maximum: 5
+          example: 3
     ActorRating:
       type: object
       required:
