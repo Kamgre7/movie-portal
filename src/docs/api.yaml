@@ -15,6 +15,72 @@ tags:
   - name: user
     description: Everything about users
 paths:
+  /auth/login:
+    post:
+      tags:
+        - auth
+      summary: Log in
+      description: User log in
+      operationId: LogIn
+      requestBody:
+        description: User information
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequestBody'
+      responses:
+        '201':
+          description: Successful operation - user logged in
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+  /auth/logout:
+    delete:
+      security:
+        - bearerAuth: []
+      tags:
+        - auth
+      summary: Log out
+      description: User log out
+      operationId: LogOut
+      responses:
+        '204':
+          description: Successful operation - user logged out
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+  /auth/token/refresh:
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - auth
+      summary: Refresh user refresh token
+      description: Refresh user refresh token
+      operationId: refreshToken
+      requestBody:
+        description: Body have to include refresh token
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshTokenRequestBody'
+      responses:
+        '201':
+          description: Successful operation - token refreshed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RefreshTokenResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
   /actors:
     post:
       security:
@@ -105,7 +171,7 @@ paths:
                   maximum: 5
                   example: 3
       responses:
-        '204':
+        '201':
           description: Successful operation - actor rated by user
           content:
             application/json:
@@ -275,6 +341,44 @@ components:
       properties:
         error:
           type: string
+    LoginRequestBody:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          example: john@example.com
+        password:
+          type: string
+          minLength: 3
+          example: userPwd123$%
+          description: Minimum eight characters, at least one uppercase, one lowercase character, one number and one special character
+    LoginResponse:
+      type: object
+      properties:
+        accessToken:
+          type: string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2Y2E1Y2YzLTY5ZTAtNDBjYi04NjMzLTZiYzNmMGY1YjgzYiIsImVtYWlsIjoiYWRtaW5AZ21haWwuY29tIiwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzAyODUzNjM1LCJleHAiOjE3MDI5NDAwMzV9.S_M5XBbzN1ZDilk51sT9108DqLgO-lv6kLIja-YT2cM
+        refreshToken:
+          type: string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2Y2E1Y2YzLTY5ZTAtNDBjYi04NjMzLTZiYzNmMGY1YjgzYiIsImVtYWlsIjoiYWRtaW5AZ21haWwuY29tIiwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzAyODUzNjM1LCJleHAiOjE3MDMyODU2MzV9.WtRkgvh7b7pBs6hymXZHxYDYA7GKOSSQfX0vUKKP1x8
+    RefreshTokenRequestBody:
+      type: object
+      required:
+        - refreshToken
+      properties:
+        refreshToken:
+          type: string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2Y2E1Y2YzLTY5ZTAtNDBjYi04NjMzLTZiYzNmMGY1YjgzYiIsImVtYWlsIjoiYWRtaW5AZ21haWwuY29tIiwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzAyODUzNjM1LCJleHAiOjE3MDI5NDAwMzV9.S_M5XBbzN1ZDilk51sT9108DqLgO-lv6kLIja-YT2cM
+    RefreshTokenResponse:
+      type: object
+      properties:
+        token:
+          type: string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2Y2E1Y2YzLTY5ZTAtNDBjYi04NjMzLTZiYzNmMGY1YjgzYiIsImVtYWlsIjoiYWRtaW5AZ21haWwuY29tIiwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzAyODUzNjM1LCJleHAiOjE3MDI5NDAwMzV9.S_M5XBbzN1ZDilk51sT9108DqLgO-lv6kLIja-YT2cM
     ActorRating:
       type: object
       required:
