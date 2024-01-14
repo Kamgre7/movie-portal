@@ -128,7 +128,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ActorRatingRequestBody'
+              $ref: '#/components/schemas/RatingRequestBody'
       responses:
         '201':
           description: Successful operation - actor rated by user
@@ -157,7 +157,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ActorRatingRequestBody'
+              $ref: '#/components/schemas/RatingRequestBody'
       responses:
         '204':
           description: Successful operation - actor rating updated
@@ -199,7 +199,7 @@ paths:
         - $ref: '#/components/parameters/WithRatingParam'
       responses:
         '200':
-          description: Successful operation
+          description: Successful operation - return actor information
           content:
             application/json:
               schema:
@@ -237,6 +237,126 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         '403':
           $ref: '#/components/responses/ForbiddenError'
+  /movies/rate/${id}:
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - movie
+      summary: Rate movie
+      description: Rate movie
+      operationId: RateMovie
+      parameters:
+        - $ref: '#/components/parameters/MovieIdParams'
+      requestBody:
+        description: Movie rate
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RatingRequestBody'
+      responses:
+        '201':
+          description: Successful operation - movie rated by user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MovieRating'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+    patch:
+      security:
+        - bearerAuth: []
+      tags:
+        - movie
+      summary: Update movie rating
+      description: Update movie rating
+      operationId: UpdateMovieRating
+      parameters:
+        - $ref: '#/components/parameters/MovieIdParams'
+      requestBody:
+        description: Movie rate
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RatingRequestBody'
+      responses:
+        '204':
+          description: Successful operation - movie rating updated
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+  /movies/search:
+    get:
+      tags:
+        - movie
+      summary: Get movies by criteria
+      description: Get all movies by criteria
+      operationId: GetMoviesByCriteria
+      parameters:
+        - $ref: '#/components/parameters/MovieTitleParam'
+        - $ref: '#/components/parameters/MovieCategoryParam'
+        - $ref: '#/components/parameters/MovieReleaseDateParam'
+      responses:
+        '200':
+          description: Success operation - return array with movies
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MovieWithRating'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+  /movies/{id}:
+    get:
+      tags:
+        - movie
+      summary: Get movie
+      description: Get movie by ID
+      operationId: GetMovie
+      parameters:
+        - $ref: '#/components/parameters/MovieIdParams'
+        - $ref: '#/components/parameters/WithRatingParam'
+      responses:
+        '200':
+          description: Successful operation - return movie information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MovieWithRating'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+  /movies/{id}/actors:
+    post:
+      tags:
+        - movie
+      summary: Add actors to movie
+      description: Add actors to movie
+      operationId: AddActorsToMovie
+      parameters:
+        - $ref: '#/components/parameters/MovieIdParams'
+      requestBody:
+        description: Array of actor's ids
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddActorsToMovieRequestBody'
+      responses:
+        '204':
+          description: Successful operation - actors added to movie
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
 components:
   securitySchemes:
     bearerAuth:
@@ -283,6 +403,13 @@ components:
       required: true
       schema:
         $ref: '#/components/schemas/ActorIdProperty'
+    MovieIdParams:
+      name: id
+      in: path
+      description: The ID of the movie
+      required: true
+      schema:
+        $ref: '#/components/schemas/MovieIdProperty'
     MovieIdParam:
       name: movieId
       in: path
@@ -311,6 +438,27 @@ components:
       required: false
       schema:
         $ref: '#/components/schemas/WithRatingProperty'
+    MovieTitleParam:
+      name: title
+      in: query
+      description: movie title
+      required: false
+      schema:
+        $ref: '#/components/schemas/MovieTitleProperty'
+    MovieCategoryParam:
+      name: category
+      in: query
+      description: movie category
+      required: false
+      schema:
+        $ref: '#/components/schemas/MovieCategoryProperty'
+    MovieReleaseDateParam:
+      name: releaseDate
+      in: query
+      description: movie release date
+      required: false
+      schema:
+        $ref: '#/components/schemas/MovieReleaseDateProperty'
   schemas:
     Error:
       type: object
@@ -437,7 +585,16 @@ components:
           $ref: '#/components/schemas/ActorLastNameProperty'
         gender:
           $ref: '#/components/schemas/GenderProperty'
-    ActorRatingRequestBody:
+    AddActorsToMovieRequestBody:
+      type: object
+      required:
+        - actorIds
+      properties:
+        actorIds:
+          type: array
+          items:
+            $ref: '#/components/schemas/ActorIdProperty'
+    RatingRequestBody:
       type: object
       required:
         - rating
@@ -468,6 +625,16 @@ components:
           $ref: '#/components/schemas/UserIdProperty'
         movieId:
           $ref: '#/components/schemas/MovieIdProperty'
+        rating:
+          $ref: '#/components/schemas/RatingProperty'
+    MovieRating:
+      type: object
+      required:
+        - userId
+        - rating
+      properties:
+        userId:
+          $ref: '#/components/schemas/UserIdProperty'
         rating:
           $ref: '#/components/schemas/RatingProperty'
     Actor:
@@ -528,3 +695,11 @@ components:
           $ref: '#/components/schemas/UpdatedAtProperty'
         deletedAt:
           $ref: '#/components/schemas/DeletedAtProperty'
+    MovieWithRating:
+      allOf:
+        - $ref: '#/components/schemas/Movie'
+      properties:
+        rating:
+          type: array
+          items:
+            $ref: '#/components/schemas/MovieRating'
