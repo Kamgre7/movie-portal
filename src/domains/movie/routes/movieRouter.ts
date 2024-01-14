@@ -9,6 +9,7 @@ import { FindMovieByCriteriaSchema } from '../schemas/findMovieByCriteriaValidat
 import { IUserRoleValidator } from '../../../middlewares/userRoleValidator';
 import { IAuth } from '../../../middlewares/auth';
 import { RateMovieSchema } from '../schemas/rateMovieValidationSchema';
+import { AddActorToMovieSchema } from '../schemas/addActorsToMovieValidationSchema';
 
 export const movieRouter = Router();
 
@@ -38,4 +39,9 @@ movieRouter.route('/:id').get(requestValidator(FindMovieByIdSchema), movieContro
 
 movieRouter
   .route('/:id/actors')
-  .post(authValidator.verifyUser, userRoleValidator.isAdmin, movieController.addActorsToMovie);
+  .post(
+    authValidator.verifyUser,
+    userRoleValidator.isAdmin,
+    requestValidator(AddActorToMovieSchema),
+    movieController.addActorsToMovie
+  );
