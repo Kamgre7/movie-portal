@@ -24,7 +24,11 @@ userRouter
 
 userRouter
   .route('/:id/watchlist')
-  .get(authValidator.verifyUser, requestValidator(GetMovieWatchListSchema))
+  .get(
+    authValidator.verifyUser,
+    requestValidator(GetMovieWatchListSchema),
+    userController.getMovieWatchList
+  )
   .post(
     authValidator.verifyUser,
     requestValidator(AddMovieToWatchListSchema),
