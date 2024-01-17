@@ -103,7 +103,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Actor'
+                $ref: '#/components/schemas/AddActorResponse'
         '400':
           $ref: '#/components/responses/BadRequestError'
         '401':
@@ -135,7 +135,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ActorRating'
+                $ref: '#/components/schemas/RateActorResponse'
         '400':
           $ref: '#/components/responses/BadRequestError'
         '401':
@@ -182,9 +182,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/ActorWithRating'
+                $ref: '#/components/schemas/FindActorByCriteriaResponse'
         '400':
           $ref: '#/components/responses/BadRequestError'
   /actors/{id}:
@@ -203,7 +201,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ActorWithRating'
+                $ref: '#/components/schemas/FindActorByIdResponse'
         '400':
           $ref: '#/components/responses/BadRequestError'
         '404':
@@ -230,7 +228,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Movie'
+                $ref: '#/components/schemas/AddMovieResponse'
         '400':
           $ref: '#/components/responses/BadRequestError'
         '401':
@@ -261,7 +259,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MovieRating'
+                $ref: '#/components/schemas/RateMovieResponse'
         '400':
           $ref: '#/components/responses/BadRequestError'
         '401':
@@ -307,9 +305,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/MovieWithRating'
+                $ref: '#/components/schemas/FindMoviesByCriteriaResponse'
         '400':
           $ref: '#/components/responses/BadRequestError'
   /movies/{id}:
@@ -328,7 +324,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MovieWithRating'
+                $ref: '#/components/schemas/FindMovieByIdResponse'
         '400':
           $ref: '#/components/responses/BadRequestError'
         '404':
@@ -337,6 +333,8 @@ paths:
     post:
       tags:
         - movie
+      security:
+        - bearerAuth: []
       summary: Add actors to movie
       description: Add actors to movie
       operationId: AddActorsToMovie
@@ -354,8 +352,107 @@ paths:
           description: Successful operation - actors added to movie
         '400':
           $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+  /users:
+    post:
+      tags:
+        - user
+      summary: Create user
+      description: Create user
+      operationId: CreateUser
+      requestBody:
+        description: User information
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUserRequestBody'
+      responses:
+        '201':
+          description: Successful operation - user created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateUserResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+  /users/{id}:
+    get:
+      tags:
+        - user
+      security:
+        - bearerAuth: []
+      summary: Get user
+      description: Get user by ID
+      operationId: GetUser
+      parameters:
+        - $ref: '#/components/parameters/UserIdParam'
+      responses:
+        '200':
+          description: Successful operation - return user information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateUserResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
         '404':
           $ref: '#/components/responses/NotFoundError'
+  /users/{id}/watchlist:
+    get:
+      tags:
+        - user
+      security:
+        - bearerAuth: []
+      summary: Get user watch list
+      description: Get user watch list
+      operationId: GetUserWatchList
+      parameters:
+        - $ref: '#/components/parameters/UserIdParam'
+      responses:
+        '200':
+          description: Successful operation - return user watch list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserWatchList'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+    post:
+      tags:
+        - user
+      security:
+        - bearerAuth: []
+      summary: Add movie to user watch list
+      description: Add movie to user watch list
+      operationId: AddMovieToUserWatchList
+      parameters:
+        - $ref: '#/components/parameters/UserIdParam'
+      requestBody:
+        description: Movie id to add to user watch list
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddMovieToUserWatchListRequestBody'
+      responses:
+        '201':
+          description: Successful operation - added movie to user watch list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AddMovieToUserWatchListResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
 
 components:
   securitySchemes:
@@ -389,6 +486,13 @@ components:
           schema:
             $ref: '#/components/schemas/Error'
   parameters:
+    UserIdParam:
+      name: id
+      in: path
+      description: The ID of the user
+      required: true
+      schema:
+        $ref: '#/components/schemas/UserIdProperty'
     ActorIdParams:
       name: id
       in: path
@@ -474,12 +578,23 @@ components:
       minLength: 3
       example: userPwd123$%
       description: Minimum eight characters, at least one uppercase, one lowercase character, one number and one special character
+    HashedPwdProperty:
+      type: string
+      example: 2Y2E1Y2YzLTY5ZTAtNDBjYi04NjMzLTZiYzNmMGY1YjgzYiIsImVtYWlsIjoiYWRtaW
     AccessTokenProperty:
       type: string
       example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2Y2E1Y2YzLTY5ZTAtNDBjYi04NjMzLTZiYzNmMGY1YjgzYiIsImVtYWlsIjoiYWRtaW5AZ21haWwuY29tIiwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzAyODUzNjM1LCJleHAiOjE3MDI5NDAwMzV9.S_M5XBbzN1ZDilk51sT9108DqLgO-lv6kLIja-YT2cM
     RefreshTokenProperty:
       type: string
       example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2Y2E1Y2YzLTY5ZTAtNDBjYi04NjMzLTZiYzNmMGY1YjgzYiIsImVtYWlsIjoiYWRtaW5AZ21haWwuY29tIiwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzAyODUzNjM1LCJleHAiOjE3MDMyODU2MzV9.WtRkgvh7b7pBs6hymXZHxYDYA7GKOSSQfX0vUKKP1x8
+    UserFirstNameProperty:
+      type: string
+      minLength: 3
+      example: David
+    UserLastNameProperty:
+      type: string
+      minLength: 3
+      example: Example
     ActorFirstNameProperty:
       type: string
       minLength: 3
@@ -494,6 +609,12 @@ components:
         - male
         - female
       example: male
+    RoleProperty:
+      type: string
+      enum:
+        - user
+        - admin
+      example: user
     RatingProperty:
       type: integer
       minimum: 1
@@ -556,10 +677,13 @@ components:
     LoginResponse:
       type: object
       properties:
-        accessToken:
-          $ref: '#/components/schemas/AccessTokenProperty'
-        refreshToken:
-          $ref: '#/components/schemas/RefreshTokenProperty'
+        tokens:
+          type: object
+          properties:
+            accessToken:
+              $ref: '#/components/schemas/AccessTokenProperty'
+            refreshToken:
+              $ref: '#/components/schemas/RefreshTokenProperty'
     RefreshTokenRequestBody:
       type: object
       required:
@@ -585,6 +709,11 @@ components:
           $ref: '#/components/schemas/ActorLastNameProperty'
         gender:
           $ref: '#/components/schemas/GenderProperty'
+    AddActorResponse:
+      type: object
+      properties:
+        actor:
+          $ref: '#/components/schemas/Actor'
     AddActorsToMovieRequestBody:
       type: object
       required:
@@ -601,6 +730,11 @@ components:
       properties:
         rating:
           $ref: '#/components/schemas/RatingProperty'
+    RateActorResponse:
+      type: object
+      properties:
+        rating:
+          $ref: '#/components/schemas/ActorRating'
     AddMovieRequestBody:
       type: object
       required:
@@ -614,6 +748,76 @@ components:
           $ref: '#/components/schemas/MovieCategoryProperty'
         releaseDate:
           $ref: '#/components/schemas/MovieReleaseDateProperty'
+    AddMovieResponse:
+      type: object
+      properties:
+        movie:
+          $ref: '#/components/schemas/Movie'
+    CreateUserRequestBody:
+      type: object
+      required:
+        - email
+        - firstName
+        - lastName
+        - password
+        - gender
+      properties:
+        email:
+          $ref: '#/components/schemas/EmailProperty'
+        firstName:
+          $ref: '#/components/schemas/UserFirstNameProperty'
+        lastName:
+          $ref: '#/components/schemas/UserLastNameProperty'
+        password:
+          $ref: '#/components/schemas/PwdProperty'
+        gender:
+          $ref: '#/components/schemas/GenderProperty'
+    AddMovieToUserWatchListRequestBody:
+      type: object
+      required:
+        - movieId
+      properties:
+        movieId:
+          $ref: '#/components/schemas/MovieIdProperty'
+    AddMovieToUserWatchListResponse:
+      type: object
+      properties:
+        watchListInfo:
+          $ref: '#/components/schemas/MovieIdProperty'
+    FindActorByCriteriaResponse:
+      type: object
+      properties:
+        actors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ActorWithRating'
+    FindActorByIdResponse:
+      type: object
+      properties:
+        actor:
+          $ref: '#/components/schemas/ActorWithRating'
+    RateMovieResponse:
+      type: object
+      properties:
+        ratingInfo:
+          $ref: '#/components/schemas/MovieRating'
+    FindMoviesByCriteriaResponse:
+      type: object
+      properties:
+        movies:
+          type: array
+          items:
+            $ref: '#/components/schemas/MovieWithRating'
+    FindMovieByIdResponse:
+      type: object
+      properties:
+        movie:
+          $ref: '#/components/schemas/MovieWithRating'
+    CreateUserResponse:
+      type: object
+      properties:
+        user:
+          $ref: '#/components/schemas/User'
     ActorRating:
       type: object
       required:
@@ -703,3 +907,46 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/MovieRating'
+    User:
+      type: object
+      required:
+        - id
+        - email
+        - firstName
+        - lastName
+        - password
+        - gender
+        - role
+        - createdAt
+        - updatedAt
+        - deletedAt
+      properties:
+        id:
+          $ref: '#/components/schemas/UserIdProperty'
+        email:
+          $ref: '#/components/schemas/EmailProperty'
+        firstName:
+          $ref: '#/components/schemas/UserFirstNameProperty'
+        lastName:
+          $ref: '#/components/schemas/UserLastNameProperty'
+        password:
+          $ref: '#/components/schemas/HashedPwdProperty'
+        gender:
+          $ref: '#/components/schemas/GenderProperty'
+        role:
+          $ref: '#/components/schemas/RoleProperty'
+        createdAt:
+          $ref: '#/components/schemas/CreatedAtProperty'
+        updatedAt:
+          $ref: '#/components/schemas/UpdatedAtProperty'
+        deletedAt:
+          $ref: '#/components/schemas/DeletedAtProperty'
+    UserWatchList:
+      type: object
+      required:
+        - watchList
+      properties:
+        watchList:
+          type: array
+          items:
+            $ref: '#/components/schemas/MovieIdProperty'
