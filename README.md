@@ -1,7 +1,5 @@
 # Movie Portal App
 
-#### 🛠 I am currently working on improving the project. This is not the final version yet, so expect further updates and additional features. 🛠
-
 Movie Portal is a web application which provides a platform for users to interact with movies and actors, offering features such as user authentication, movie and actor ratings, movie catalog creation, and advanced filtering options.
 
 ### Features
@@ -34,6 +32,9 @@ Movie Portal is a web application which provides a platform for users to interac
 - Kysely
 - Jest
 - Docker
+- Husky
+- JWT
+- Swagger
 
 ### Allowed actions
 
