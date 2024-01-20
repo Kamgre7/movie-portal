@@ -32,9 +32,7 @@ describe('Actor service', () => {
     actorService = container.get<IActorService>(TYPES.ActorServiceToken);
     userRepository = container.get<IUserRepository>(TYPES.UserRepositoryToken);
     actorRatingRepository = container.get<IActorRatingRepository>(TYPES.ActorRatingRepositoryToken);
-    actorsMoviesRepository = container.get<IActorsMoviesRepository>(
-      TYPES.ActorMoviesRepositoryToken
-    );
+    actorsMoviesRepository = container.get<IActorsMoviesRepository>(TYPES.ActorMoviesRepositoryToken);
     actorRepository = container.get<IActorRepository>(TYPES.ActorRepositoryToken);
     movieRepository = container.get<IMovieRepository>(TYPES.MovieRepositoryToken);
   });
@@ -91,10 +89,7 @@ describe('Actor service', () => {
 
     it('Should find actor by criteria', async () => {
       const createdActor = await actorRepository.create(actorInfo);
-      const [foundActor] = await actorService.findByCriteria(
-        { lastName: actorInfo.lastName },
-        false
-      );
+      const [foundActor] = await actorService.findByCriteria({ lastName: actorInfo.lastName }, false);
 
       expect(foundActor).toStrictEqual(createdActor);
     });

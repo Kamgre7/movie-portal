@@ -22,15 +22,11 @@ export class ActorRepository implements IActorRepository {
     private readonly errorMapper: IErrorMapper,
     @inject(TYPES.ActorRatingRepositoryToken)
     private readonly actorRatingRepository: IActorRatingRepository,
-    private readonly db = database
+    private readonly db = database,
   ) {}
 
   async findById(id: string, withRating: boolean): Promise<IActorModel | null> {
-    const actor = await this.db
-      .selectFrom(this.actorsTable)
-      .where('id', '=', id)
-      .selectAll()
-      .executeTakeFirst();
+    const actor = await this.db.selectFrom(this.actorsTable).where('id', '=', id).selectAll().executeTakeFirst();
 
     if (!actor) {
       return null;
@@ -56,9 +52,7 @@ export class ActorRepository implements IActorRepository {
     const actors = await query.selectAll().execute();
 
     if (withRating) {
-      const actorsRating = await Promise.all(
-        actors.map((actor) => this.actorRatingRepository.find(actor.id))
-      );
+      const actorsRating = await Promise.all(actors.map((actor) => this.actorRatingRepository.find(actor.id)));
 
       return actors.map((actor, index) => Actor.createWithRating(actor, actorsRating[index]));
     }

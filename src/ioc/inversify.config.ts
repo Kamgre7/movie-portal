@@ -11,29 +11,14 @@ import { ActorRepository, IActorRepository } from '../domains/actor/repository/a
 import { ActorService, IActorService } from '../domains/actor/services/actorService';
 import { ActorController, IActorController } from '../domains/actor/controllers/actorController';
 import { ErrorMapper, IErrorMapper } from '../errors/errorMapper';
-import {
-  ActorRatingRepository,
-  IActorRatingRepository,
-} from '../domains/actor/repository/actorRatingRepository';
-import {
-  ActorsMoviesRepository,
-  IActorsMoviesRepository,
-} from '../domains/actor/repository/actorMovieRepository';
-import {
-  IMovieRatingRepository,
-  MovieRatingRepository,
-} from '../domains/movie/repository/movieRatingRepository';
+import { ActorRatingRepository, IActorRatingRepository } from '../domains/actor/repository/actorRatingRepository';
+import { ActorsMoviesRepository, IActorsMoviesRepository } from '../domains/actor/repository/actorMovieRepository';
+import { IMovieRatingRepository, MovieRatingRepository } from '../domains/movie/repository/movieRatingRepository';
 import { AuthService, IAuthService } from '../domains/auth/services/authService';
 import { AuthController, IAuthController } from '../domains/auth/controllers/authController';
 import { IJwtManager, JwtManager } from '../domains/auth/jwt/jwtManager';
-import {
-  IWatchListRepository,
-  WatchListRepository,
-} from '../domains/user/repository/watchilistRepository';
-import {
-  IRefreshTokenRepository,
-  RefreshTokenRepository,
-} from '../domains/auth/repository/refreshTokenRepository';
+import { IWatchListRepository, WatchListRepository } from '../domains/user/repository/watchilistRepository';
+import { IRefreshTokenRepository, RefreshTokenRepository } from '../domains/auth/repository/refreshTokenRepository';
 import { IJwtCreator, JwtCreator } from '../domains/auth/jwt/jwtCreator';
 import { Auth, IAuth } from '../middlewares/auth';
 import { IUserRoleValidator, UserRoleValidator } from '../middlewares/userRoleValidator';
@@ -56,9 +41,7 @@ container.bind<IAuth>(TYPES.AuthToken).to(Auth);
 container.bind<IAuthService>(TYPES.AuthServiceToken).to(AuthService);
 container.bind<IAuthController>(TYPES.AuthControllerToken).to(AuthController);
 container.bind<IJwtManager>(TYPES.JwtManagerToken).to(JwtManager);
-container
-  .bind<IRefreshTokenRepository>(TYPES.RefreshTokenRepositoryToken)
-  .to(RefreshTokenRepository);
+container.bind<IRefreshTokenRepository>(TYPES.RefreshTokenRepositoryToken).to(RefreshTokenRepository);
 container.bind<IJwtCreator>(TYPES.JwtCreatorToken).to(JwtCreator);
 
 // movies
@@ -78,9 +61,7 @@ container.bind<IActorController>(TYPES.ActorControllerToken).to(ActorController)
 container.bind<IActorRatingRepository>(TYPES.ActorRatingRepositoryToken).to(ActorRatingRepository);
 
 //actors_movies
-container
-  .bind<IActorsMoviesRepository>(TYPES.ActorMoviesRepositoryToken)
-  .to(ActorsMoviesRepository);
+container.bind<IActorsMoviesRepository>(TYPES.ActorMoviesRepositoryToken).to(ActorsMoviesRepository);
 
 // errorMapper
 container.bind<IErrorMapper>(TYPES.ErrorMapperToken).to(ErrorMapper);

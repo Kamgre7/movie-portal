@@ -1,8 +1,5 @@
 import { v4 as uuid } from 'uuid';
-import {
-  FindActorByCriteria,
-  FindActorByIdSchema,
-} from '../../../../domains/actor/schemas/findActorValidationSchema';
+import { FindActorByCriteria, FindActorByIdSchema } from '../../../../domains/actor/schemas/findActorValidationSchema';
 
 describe('Find actor validation schema', () => {
   let queryByCriteria: {

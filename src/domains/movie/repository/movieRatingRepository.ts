@@ -23,7 +23,7 @@ export class MovieRatingRepository implements IMovieRatingRepository {
   constructor(
     @inject(TYPES.ErrorMapperToken)
     private readonly errorMapper: IErrorMapper,
-    private readonly db = database
+    private readonly db = database,
   ) {}
 
   async rate(movieRating: MovieRatingData): Promise<IMovieRatingModel> {

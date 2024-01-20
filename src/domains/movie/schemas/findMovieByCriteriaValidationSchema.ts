@@ -18,10 +18,7 @@ export const FindMovieByCriteriaSchema = z.object({
 
 export type FindMovieByCriteriaReq = z.infer<typeof FindMovieByCriteriaSchema>;
 
-export type MovieCriteria = Omit<
-  z.infer<typeof FindMovieByCriteriaQuery>,
-  'withRating' | 'withActors'
->;
+export type MovieCriteria = Omit<z.infer<typeof FindMovieByCriteriaQuery>, 'withRating' | 'withActors'>;
 
 export type MovieExtensionCriteria = {
   withRating: boolean;

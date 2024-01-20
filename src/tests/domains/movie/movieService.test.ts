@@ -95,7 +95,7 @@ describe('Movie service', () => {
         {
           withActors: false,
           withRating: false,
-        }
+        },
       );
 
       expect(createdMovie).toStrictEqual(foundMovie);
@@ -106,7 +106,7 @@ describe('Movie service', () => {
 
       const foundMovie = await movieService.findByCriteria(
         { title: 'Example' },
-        { withActors: false, withRating: false }
+        { withActors: false, withRating: false },
       );
 
       expect(foundMovie).toHaveLength(0);

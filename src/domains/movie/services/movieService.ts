@@ -3,10 +3,7 @@ import { IMovieModel } from '../models/movie';
 import { NewMovie } from '../schemas/createMovieValidationSchema';
 import { TYPES } from '../../../ioc/types/types';
 import { NotFoundError } from '../../../errors/notFoundError';
-import {
-  MovieExtensionCriteria,
-  MovieCriteria,
-} from '../schemas/findMovieByCriteriaValidationSchema';
+import { MovieExtensionCriteria, MovieCriteria } from '../schemas/findMovieByCriteriaValidationSchema';
 import { IActorsMoviesRepository } from '../../actor/repository/actorMovieRepository';
 import { IMovieRatingRepository, MovieRatingData } from '../repository/movieRatingRepository';
 import { IMovieRatingModel } from '../models/movieRating';
@@ -15,10 +12,7 @@ import { IMovieRepository } from '../repository/movieRepository';
 export interface IMovieService {
   create(newMovie: NewMovie): Promise<IMovieModel>;
   findById(id: string, extension: MovieExtensionCriteria): Promise<IMovieModel>;
-  findByCriteria(
-    criteria: MovieCriteria,
-    extension: MovieExtensionCriteria
-  ): Promise<IMovieModel[]>;
+  findByCriteria(criteria: MovieCriteria, extension: MovieExtensionCriteria): Promise<IMovieModel[]>;
 
   rate(movieRating: MovieRatingData): Promise<IMovieRatingModel>;
   updateRate(movieRating: MovieRatingData): Promise<IMovieRatingModel>;
@@ -34,7 +28,7 @@ export class MovieService implements IMovieService {
     @inject(TYPES.MovieRatingRepositoryToken)
     private readonly movieRatingRepository: IMovieRatingRepository,
     @inject(TYPES.ActorMoviesRepositoryToken)
-    private readonly actorMovieRepository: IActorsMoviesRepository
+    private readonly actorMovieRepository: IActorsMoviesRepository,
   ) {}
 
   async create(newMovie: NewMovie): Promise<IMovieModel> {
@@ -59,10 +53,7 @@ export class MovieService implements IMovieService {
     return movie;
   }
 
-  async findByCriteria(
-    criteria: MovieCriteria,
-    extension: MovieExtensionCriteria
-  ): Promise<IMovieModel[]> {
+  async findByCriteria(criteria: MovieCriteria, extension: MovieExtensionCriteria): Promise<IMovieModel[]> {
     const movies = await this.movieRepository.findByCriteria(criteria, extension);
 
     return movies;

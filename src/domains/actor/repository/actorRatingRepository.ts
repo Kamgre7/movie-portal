@@ -24,7 +24,7 @@ export class ActorRatingRepository implements IActorRatingRepository {
   constructor(
     @inject(TYPES.ErrorMapperToken)
     private readonly errorMapper: IErrorMapper,
-    private readonly db = database
+    private readonly db = database,
   ) {}
 
   async rate(rateInfo: ActorInMovieRating): Promise<IActorRatingModel> {

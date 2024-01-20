@@ -13,7 +13,7 @@ export interface IAuth {
 export class Auth implements IAuth {
   constructor(
     @inject(TYPES.JwtCreatorToken)
-    private readonly jwtCreator: IJwtCreator
+    private readonly jwtCreator: IJwtCreator,
   ) {}
 
   verifyUser = (req: Request, res: Response, next: NextFunction): void => {

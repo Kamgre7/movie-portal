@@ -21,7 +21,7 @@ export class ActorsMoviesRepository implements IActorsMoviesRepository {
   constructor(
     @inject(TYPES.ErrorMapperToken)
     private readonly errorMapper: IErrorMapper,
-    private readonly db = database
+    private readonly db = database,
   ) {}
 
   async find(actorId: string, movieId: string): Promise<ActorInMovie | null> {

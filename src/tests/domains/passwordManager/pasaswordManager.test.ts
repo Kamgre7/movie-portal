@@ -1,7 +1,4 @@
-import {
-  IPasswordManager,
-  PasswordManager,
-} from '../../../domains/passwordManager/passwordManager';
+import { IPasswordManager, PasswordManager } from '../../../domains/passwordManager/passwordManager';
 
 describe('Password manager', () => {
   let passwordManager: IPasswordManager;

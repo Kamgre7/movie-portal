@@ -7,7 +7,7 @@ export type ExpressRequest<
     body?: Record<string, unknown>;
     params?: Record<string, unknown>;
     locals: Record<string, unknown>;
-  }
+  },
 > = Request<T['params'], {}, T['body'], T['query'] & ParsedQs, T['locals']>;
 
 export type ParsedRequest<
@@ -15,5 +15,5 @@ export type ParsedRequest<
     query?: Record<string, unknown>;
     body?: Record<string, unknown>;
     params?: Record<string, unknown>;
-  }
+  },
 > = ExpressRequest<T & { locals: {} }>;

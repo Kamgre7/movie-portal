@@ -20,7 +20,7 @@ export interface IActorController {
 export class ActorController implements IActorController {
   constructor(
     @inject(TYPES.ActorServiceToken)
-    private readonly actorService: IActorService
+    private readonly actorService: IActorService,
   ) {}
 
   findById = async (req: ParsedRequest<FindActorByIdReq>, res: Response): Promise<void> => {
@@ -33,16 +33,10 @@ export class ActorController implements IActorController {
     });
   };
 
-  findByCriteria = async (
-    req: ParsedRequest<FindActorByCriteriaReq>,
-    res: Response
-  ): Promise<void> => {
+  findByCriteria = async (req: ParsedRequest<FindActorByCriteriaReq>, res: Response): Promise<void> => {
     const { withRating, firstName, lastName } = req.query;
 
-    const actors = await this.actorService.findByCriteria(
-      { firstName, lastName },
-      withRating === 'true'
-    );
+    const actors = await this.actorService.findByCriteria({ firstName, lastName }, withRating === 'true');
 
     res.status(200).json({
       actors,

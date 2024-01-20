@@ -16,7 +16,7 @@ export interface IAuthController {
 export class AuthController implements IAuthController {
   constructor(
     @inject(TYPES.AuthServiceToken)
-    private readonly authService: IAuthService
+    private readonly authService: IAuthService,
   ) {}
 
   login = async (req: ParsedRequest<LoginReq>, res: Response): Promise<void> => {

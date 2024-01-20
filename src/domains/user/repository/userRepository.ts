@@ -18,36 +18,24 @@ export class UserRepository implements IUserRepository {
   constructor(
     @inject(TYPES.ErrorMapperToken)
     private readonly errorMapper: IErrorMapper,
-    private readonly db = database
+    private readonly db = database,
   ) {}
 
   async findById(id: string): Promise<IUserModel | null> {
-    const user = await this.db
-      .selectFrom(this.usersTable)
-      .where('id', '=', id)
-      .selectAll()
-      .executeTakeFirst();
+    const user = await this.db.selectFrom(this.usersTable).where('id', '=', id).selectAll().executeTakeFirst();
 
     return user ? User.createBasic(user) : null;
   }
 
   async findByEmail(email: string): Promise<IUserModel | null> {
-    const user = await this.db
-      .selectFrom(this.usersTable)
-      .where('email', '=', email)
-      .selectAll()
-      .executeTakeFirst();
+    const user = await this.db.selectFrom(this.usersTable).where('email', '=', email).selectAll().executeTakeFirst();
 
     return user ? User.createBasic(user) : null;
   }
 
   async create(newUser: NewUser): Promise<IUserModel> {
     try {
-      const user = await this.db
-        .insertInto('users')
-        .values(newUser)
-        .returningAll()
-        .executeTakeFirstOrThrow();
+      const user = await this.db.insertInto('users').values(newUser).returningAll().executeTakeFirstOrThrow();
 
       return User.createBasic(user);
     } catch (err) {

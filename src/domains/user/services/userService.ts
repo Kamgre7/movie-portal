@@ -5,11 +5,7 @@ import { IUserRepository } from '../repository/userRepository';
 import { NewUser } from '../schemas/createUserValidationSchema';
 import { IUserModel } from '../models/user';
 import { NotFoundError } from '../../../errors/notFoundError';
-import {
-  IWatchListRepository,
-  UserWatchList,
-  WatchListInfo,
-} from '../repository/watchilistRepository';
+import { IWatchListRepository, UserWatchList, WatchListInfo } from '../repository/watchilistRepository';
 
 export interface IUserService {
   create(newUser: NewUser): Promise<IUserModel>;
@@ -27,7 +23,7 @@ export class UserService implements IUserService {
     @inject(TYPES.UserRepositoryToken)
     private readonly userRepository: IUserRepository,
     @inject(TYPES.UserWatchListRepositoryToken)
-    private readonly watchListRepository: IWatchListRepository
+    private readonly watchListRepository: IWatchListRepository,
   ) {}
 
   async create(newUser: NewUser): Promise<IUserModel> {

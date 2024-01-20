@@ -19,7 +19,7 @@ export interface IUserController {
 export class UserController implements IUserController {
   constructor(
     @inject(TYPES.UserServiceToken)
-    private readonly userService: IUserService
+    private readonly userService: IUserService,
   ) {}
 
   findById = async (req: ParsedRequest<FindUserByIdReq>, res: Response): Promise<void> => {
@@ -38,10 +38,7 @@ export class UserController implements IUserController {
     });
   };
 
-  addMovieToWatchList = async (
-    req: ParsedRequest<AddMovieToWatchListReq>,
-    res: Response
-  ): Promise<void> => {
+  addMovieToWatchList = async (req: ParsedRequest<AddMovieToWatchListReq>, res: Response): Promise<void> => {
     const { id: userId } = req.params;
     const { movieId } = req.body;
 
@@ -52,10 +49,7 @@ export class UserController implements IUserController {
     });
   };
 
-  getMovieWatchList = async (
-    req: ParsedRequest<GetMovieWatchListReq>,
-    res: Response
-  ): Promise<void> => {
+  getMovieWatchList = async (req: ParsedRequest<GetMovieWatchListReq>, res: Response): Promise<void> => {
     const user = res.locals.user;
 
     const watchList = await this.userService.getWatchList(user.id);

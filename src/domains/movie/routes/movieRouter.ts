@@ -23,7 +23,7 @@ movieRouter
     authValidator.verifyUser,
     userRoleValidator.isAdmin,
     requestValidator(CreateMovieSchema),
-    movieController.create
+    movieController.create,
   );
 
 movieRouter
@@ -31,9 +31,7 @@ movieRouter
   .post(authValidator.verifyUser, requestValidator(RateMovieSchema), movieController.rate)
   .patch(authValidator.verifyUser, requestValidator(RateMovieSchema), movieController.updateRate);
 
-movieRouter
-  .route('/search')
-  .get(requestValidator(FindMovieByCriteriaSchema), movieController.findByCriteria);
+movieRouter.route('/search').get(requestValidator(FindMovieByCriteriaSchema), movieController.findByCriteria);
 
 movieRouter.route('/:id').get(requestValidator(FindMovieByIdSchema), movieController.findById);
 
@@ -43,5 +41,5 @@ movieRouter
     authValidator.verifyUser,
     userRoleValidator.isAdmin,
     requestValidator(AddActorToMovieSchema),
-    movieController.addActorsToMovie
+    movieController.addActorsToMovie,
   );

@@ -24,7 +24,7 @@ export interface IMovieController {
 export class MovieController implements IMovieController {
   constructor(
     @inject(TYPES.MovieServiceToken)
-    private readonly movieService: IMovieService
+    private readonly movieService: IMovieService,
   ) {}
 
   create = async (req: ParsedRequest<CreateMovieReq>, res: Response): Promise<void> => {
@@ -48,10 +48,7 @@ export class MovieController implements IMovieController {
     });
   };
 
-  findByCriteria = async (
-    req: ParsedRequest<FindMovieByCriteriaReq>,
-    res: Response
-  ): Promise<void> => {
+  findByCriteria = async (req: ParsedRequest<FindMovieByCriteriaReq>, res: Response): Promise<void> => {
     const extensionCriteria = {
       withRating: req.query.withRating === 'true',
       withActors: req.query.withActors === 'true',

@@ -27,7 +27,7 @@ export class ActorService implements IActorService {
     @inject(TYPES.ActorRatingRepositoryToken)
     private readonly actorRatingRepository: IActorRatingRepository,
     @inject(TYPES.ActorMoviesRepositoryToken)
-    private readonly actorMoviesRepository: IActorsMoviesRepository
+    private readonly actorMoviesRepository: IActorsMoviesRepository,
   ) {}
 
   async create(newActor: NewActor): Promise<IActorModel> {
@@ -50,10 +50,7 @@ export class ActorService implements IActorService {
   }
 
   async rate(rateInfo: ActorInMovieRating): Promise<IActorRatingModel> {
-    const actorInMovieExist = await this.actorMoviesRepository.find(
-      rateInfo.actorId,
-      rateInfo.movieId
-    );
+    const actorInMovieExist = await this.actorMoviesRepository.find(rateInfo.actorId, rateInfo.movieId);
 
     if (!actorInMovieExist) {
       throw new BadRequestError('Actor in movie not found');

@@ -18,8 +18,4 @@ authRouter.route('/logout').delete(authValidator.verifyUser, authController.logo
 
 authRouter
   .route('/token/refresh')
-  .post(
-    authValidator.verifyUser,
-    requestValidator(RefreshTokenSchema),
-    authController.refreshToken
-  );
+  .post(authValidator.verifyUser, requestValidator(RefreshTokenSchema), authController.refreshToken);

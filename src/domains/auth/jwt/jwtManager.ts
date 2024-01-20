@@ -28,21 +28,13 @@ export class JwtManager implements IJwtManager {
 
   constructor(
     @inject(TYPES.JwtCreatorToken)
-    private readonly jwtCreator: IJwtCreator
+    private readonly jwtCreator: IJwtCreator,
   ) {}
 
   createToken(payload: UserPayload): TokenPair {
-    const accessToken = this.jwtCreator.generate(
-      payload,
-      jwtConfig.jwtTokenSecret,
-      this.accessTokenExpiresIn
-    );
+    const accessToken = this.jwtCreator.generate(payload, jwtConfig.jwtTokenSecret, this.accessTokenExpiresIn);
 
-    const refreshToken = this.jwtCreator.generate(
-      payload,
-      jwtConfig.jwtRefreshTokenSecret,
-      this.refreshTokenExpiresIn
-    );
+    const refreshToken = this.jwtCreator.generate(payload, jwtConfig.jwtRefreshTokenSecret, this.refreshTokenExpiresIn);
 
     return { accessToken, refreshToken };
   }
@@ -54,7 +46,7 @@ export class JwtManager implements IJwtManager {
       const newAccessToken = this.jwtCreator.generate(
         { email: payload.email, id: payload.id, role: payload.role },
         jwtConfig.jwtTokenSecret,
-        this.accessTokenExpiresIn
+        this.accessTokenExpiresIn,
       );
 
       return newAccessToken;

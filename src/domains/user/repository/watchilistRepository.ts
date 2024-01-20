@@ -24,7 +24,7 @@ export class WatchListRepository implements IWatchListRepository {
   constructor(
     @inject(TYPES.ErrorMapperToken)
     private readonly errorMapper: IErrorMapper,
-    private readonly db = database
+    private readonly db = database,
   ) {}
 
   async getAll(userId: string): Promise<UserWatchList[]> {

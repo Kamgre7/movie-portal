@@ -21,12 +21,10 @@ actorRouter
     authValidator.verifyUser,
     userRoleValidator.isAdmin,
     requestValidator(CreateActorSchema),
-    actorController.create
+    actorController.create,
   );
 
-actorRouter
-  .route('/search')
-  .get(requestValidator(FindActorByCriteria), actorController.findByCriteria);
+actorRouter.route('/search').get(requestValidator(FindActorByCriteria), actorController.findByCriteria);
 
 actorRouter
   .route('/:actorId/rate/movies/:movieId')

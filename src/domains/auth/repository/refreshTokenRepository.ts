@@ -33,7 +33,7 @@ export class RefreshTokenRepository implements IRefreshTokenRepository {
   constructor(
     @inject(TYPES.ErrorMapperToken)
     private readonly errorMapper: IErrorMapper,
-    private readonly db = database
+    private readonly db = database,
   ) {}
 
   async find(criteria: TokenCriteria): Promise<TokenInfo<string> | null> {

@@ -11,9 +11,7 @@ async function createDbIfNotExist(dbInfo: DbConfig) {
 
   await client.connect();
 
-  const res = await client.query(
-    `SELECT datname FROM pg_catalog.pg_database WHERE datname = '${dbInfo.dbName}'`
-  );
+  const res = await client.query(`SELECT datname FROM pg_catalog.pg_database WHERE datname = '${dbInfo.dbName}'`);
 
   if (res.rowCount === 0) {
     console.log(`${dbInfo.dbName} database not found, creating it.`);

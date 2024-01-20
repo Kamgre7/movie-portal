@@ -24,7 +24,7 @@ export class AuthService implements IAuthService {
     @inject(TYPES.JwtManagerToken)
     private readonly jwtManager: IJwtManager,
     @inject(TYPES.RefreshTokenRepositoryToken)
-    private readonly refreshTokenRepository: IRefreshTokenRepository
+    private readonly refreshTokenRepository: IRefreshTokenRepository,
   ) {}
 
   async login(loginInfo: LoginData): Promise<TokenPair> {
